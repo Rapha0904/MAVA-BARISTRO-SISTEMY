@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesas - Mava Baristro</title>
+
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+.mesas-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap:18px;
+    margin-top:25px;
+}
+
+.mesa-card{
+    background:#ffffff;
+    border-radius:14px;
+    padding:14px;
+    text-align:center;
+    box-shadow:0 3px 10px rgba(0,0,0,0.12);
+    border:3px solid var(--dourado);
+    cursor:pointer;
+    transition:.25s;
+    position: relative;
+}
+
+.mesa-card.livre{
+    background:#e9ffe9;
+    border-color:#2ecc71;
+}
+
+.mesa-card.ocupada{
+    background:#ffe9e9;
+    border-color:#e74c3c;
+}
+
+.mesa-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 5px 16px rgba(0,0,0,0.18);
+}
+
+.mesa-id{
+    font-size:22px;
+    font-weight:bold;
+    color:var(--azul);
+}
+
+.mesa-status{
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+.mesa-clientes{
+    font-size:13px;
+    color:#444;
+}
+
+/* QR CODE */
+.qr-area{
+    margin-top:10px;
+}
+.qr-area img{
+    width:90px;
+    height:90px;
+    border-radius:8px;
+    border:2px solid var(--dourado);
+    background:white;
+}
+
+/* MODAL */
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.modal{
+    background:#ffffff;
+    border-radius:16px;
+    padding:20px;
+    width:90%;
+    max-width:420px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.3);
+}
+
+.modal h2{
+    margin-bottom:10px;
+    color:var(--azul);
+}
+
+.modal label{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.modal input{
+    width:100%;
+    padding:8px 10px;
+    border-radius:10px;
+    border:1px solid #aaa;
+    margin-top:4px;
+    margin-bottom:10px;
+}
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:8px 0;
+}
+
+.chip{
+    background:#f0f0f0;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.chip i{
+    cursor:pointer;
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:10px;
+}
+
+.btn-small{
+    flex:1;
+    padding:8px 10px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-primary{
+    background:var(--azul);
+    color:var(--dourado);
+}
+
+.btn-danger{
+    background:#c0392b;
+    color:#fff;
+}
+
+.btn-secondary{
+    background:#bdc3c7;
+    color:#2c3e50;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU MOBILE -->
+<div class="menu-toggle" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+
+    <h2>Mava Baristro</h2>
+
+    <div class="menu-item" onclick="go('dashboard.html')">
+        <i class="fas fa-chart-line"></i> Dashboard
+    </div>
+
+    <div class="menu-item" onclick="go('produtos.html')">
+        <i class="fas fa-mug-hot"></i> Produtos
+    </div>
+
+    <div class="menu-item" onclick="go('cozinha.html')">
+        <i class="fas fa-kitchen-set"></i> Cozinha
+    </div>
+
+    <div class="menu-item" onclick="go('caixa.html')">
+        <i class="fas fa-cash-register"></i> Caixa
+    </div>
+
+    <div class="menu-item active" onclick="go('mesas.html')">
+        <i class="fas fa-chair"></i> Mesas
+    </div>
+
+    <div class="menu-item" onclick="go('colaboradores.html')">
+        <i class="fas fa-users"></i> Colaboradores
+    </div>
+
+    <div class="menu-item" onclick="logout()">
+        <i class="fas fa-door-open"></i> Sair
+    </div>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="content">
+    <h1 class="title">
+        <i class="fas fa-chair"></i> Controle de Mesas
+    </h1>
+
+    <p>Gerencie quais mesas estão livres, ocupadas e visualize o QR Code de acesso do cliente.</p>
+
+    <div id="mesasGrid" class="mesas-grid"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+        <h2 id="modalTitulo">Mesa</h2>
+
+        <label>Adicionar nome de cliente</label>
+        <input type="text" id="inputNome" placeholder="Ex: Maria, João, Ana">
+
+        <button class="btn-small btn-secondary" id="btnAddNome">
+            <i class="fas fa-user-plus"></i> Adicionar Nome
+        </button>
+
+        <div style="margin-top:10px;">
+            <label>Clientes nesta mesa:</label>
+            <div id="listaNomes" class="chips"></div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-small btn-danger" id="btnLimpar">
+                Limpar Mesa
+            </button>
+            <button class="btn-small btn-secondary" id="btnFechar">
+                Fechar
+            </button>
+            <button class="btn-small btn-primary" id="btnSalvar">
+                Salvar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    ref,
+    onValue,
+    set
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "../login.html";
+});
+window.logout = () => signOut(auth);
+
+/* LISTA A1 A20 */
+const MESAS = Array.from({length:20}, (_,i)=>`A${i+1}`);
+
+const grid = document.getElementById("mesasGrid");
+
+let estadoMesas = {};
+let mesaAtual = null;
+let nomesMesaAtual = [];
+
+onValue(ref(db, "mesas"), snap => {
+    estadoMesas = snap.exists() ? snap.val() : {};
+    renderGrid();
+});
+
+function gerarQR(url){
+    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+}
+
+function renderGrid(){
+    grid.innerHTML = "";
+
+    MESAS.forEach(id=>{
+        const dados = estadoMesas[id] || {status:"livre", clientes:[]};
+        const status = dados.status;
+        const clientes = dados.clientes || [];
+
+        const url = `https://rapha0904.github.io/MAVA-BRISTRO/cardapio.html?mesa=${id}`;
+
+        const div = document.createElement("div");
+        div.className = `mesa-card ${status}`;
+        div.onclick = ()=>abrirModal(id, dados);
+
+        div.innerHTML = `
+            <div class="mesa-id">${id}</div>
+            <div class="mesa-status">
+                ${status === "livre" ? "Livre" : "Ocupada"}
+            </div>
+            <div class="mesa-clientes">
+                ${clientes.length ? clientes.join(", ") : "Nenhum cliente"}
+            </div>
+
+            <div class="qr-area">
+                <a href="${url}" target="_blank">
+                    <img src="${gerarQR(url)}">
+                </a>
+            </div>
+        `;
+
+        grid.appendChild(div);
+    });
+}
+
+function abrirModal(id, dados){
+    mesaAtual = id;
+    nomesMesaAtual = dados.clientes || [];
+
+    modalTitulo.textContent = `Mesa ${id}`;
+    inputNome.value = "";
+    renderChips();
+
+    modalOverlay.style.display = "flex";
+}
+
+function fecharModal(){
+    modalOverlay.style.display = "none";
+}
+
+function renderChips(){
+    listaNomes.innerHTML = "";
+
+    if (!nomesMesaAtual.length){
+        listaNomes.innerHTML = `<span style="color:#777;">Nenhum nome cadastrado.</span>`;
+        return;
+    }
+
+    nomesMesaAtual.forEach((nome, index)=>{
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = `
+            <span>${nome}</span>
+            <i class="fas fa-times"></i>
+        `;
+        chip.querySelector("i").onclick = ()=>{
+            nomesMesaAtual.splice(index,1);
+            renderChips();
+        };
+        listaNomes.appendChild(chip);
+    });
+}
+
+btnAddNome.onclick = ()=>{
+    if (!inputNome.value.trim()) return;
+    nomesMesaAtual.push(inputNome.value.trim());
+    inputNome.value = "";
+    renderChips();
+};
+
+btnSalvar.onclick = async ()=>{
+    if (!mesaAtual) return;
+
+    const status = nomesMesaAtual.length ? "ocupada" : "livre";
+
+    await set(ref(db, "mesas/" + mesaAtual), {
+        status,
+        clientes: nomesMesaAtual
+    });
+
+    fecharModal();
+};
+
+btnLimpar.onclick = async ()=>{
+    await set(ref(db, "mesas/" + mesaAtual), {
+        status:"livre",
+        clientes:[]
+    });
+    fecharModal();
+};
+
+btnFechar.onclick = fecharModal;
+modalOverlay.onclick = (e)=>{ if(e.target===modalOverlay) fecharModal(); };
+</script>
+
+<script>
+function go(p){ window.location.href = p; }
+function toggleMenu(){
+    document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
+
+</body>
+</html>
