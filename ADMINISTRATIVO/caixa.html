@@ -96,12 +96,8 @@
 
 /* MOBILE */
 @media(max-width:600px){
-    .pedido-card{
-        padding:16px;
-    }
-    .finalizar-btn{
-        font-size:15px;
-    }
+    .pedido-card{ padding:16px; }
+    .finalizar-btn{ font-size:15px; }
 }
 
 </style>
@@ -157,17 +153,17 @@
 
 <script type="module">
 /* ============================= FIREBASE ============================= */
-import { auth, db } from "../firebase.js";   /* CORRIGIDO! */
+/* IMPORTAÇÃO CORRETA PARA GITHUB PAGES */
+import { auth, db } from "https://rapha0904.github.io/MAVA-BRISTRO/firebase.js";
 import { onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
 import {
     ref,
     onValue,
     update
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* PROTEÇÃO */
+/* ============================= PROTEÇÃO ============================= */
 onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "../login.html";
 });
@@ -180,7 +176,7 @@ if (!deviceId) {
     localStorage.setItem("deviceId", deviceId);
 }
 
-/* LISTAR PEDIDOS PRONTOS */
+/* ============================= LISTAR PEDIDOS ============================= */
 const lista = document.getElementById("lista");
 
 onValue(ref(db, "pedidos"), snap => {
@@ -193,7 +189,7 @@ onValue(ref(db, "pedidos"), snap => {
 
         if (!p) return;
 
-        // SOMENTE PEDIDOS PRONTOS E DO MESMO DISPOSITIVO
+        /* SOMENTE PEDIDOS PRONTOS E DO MESMO DISPOSITIVO */
         if (p.status !== "pronto") return;
         if (p.deviceId !== deviceId) return;
 
@@ -238,7 +234,7 @@ onValue(ref(db, "pedidos"), snap => {
     });
 });
 
-/* FINALIZAR PEDIDO */
+/* ============================= FINALIZAR PEDIDO ============================= */
 window.finalizar = id => {
 
     const forma = document.getElementById("pg-" + id).value;
