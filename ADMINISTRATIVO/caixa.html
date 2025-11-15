@@ -10,7 +10,6 @@
  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
 .pedido-card{
     background:white;
     border-radius:14px;
@@ -20,9 +19,7 @@
     border:2px solid var(--dourado);
     transition:.3s;
 }
-.pedido-card:hover{
-    transform: translateY(-4px);
-}
+.pedido-card:hover{ transform: translateY(-4px); }
 .pedido-card h3{
     color:var(--azul);
     margin-bottom:6px;
@@ -32,8 +29,8 @@
 .pedido-card ul{
     padding-left:20px;
     margin-top:6px;
+    font-size:15px;
 }
-
 .pay-select{
     width:100%;
     padding:10px;
@@ -41,7 +38,6 @@
     border:1px solid #aaa;
     margin-top:10px;
 }
-
 .finalizar-btn{
     margin-top:15px;
     width:100%;
@@ -53,6 +49,10 @@
     font-weight:bold;
     font-size:16px;
     cursor:pointer;
+    transition:.25s;
+}
+.finalizar-btn:hover{
+    background:#0d153b;
 }
 </style>
 </head>
@@ -64,47 +64,22 @@
 </div>
 
 <div class="sidebar" id="sidebar">
-
     <h2>Mava Baristro</h2>
-
-    <div class="menu-item" onclick="go('dashboard.html')">
-        <i class="fas fa-chart-line"></i> Dashboard
-    </div>
-
-    <div class="menu-item" onclick="go('produtos.html')">
-        <i class="fas fa-mug-hot"></i> Produtos
-    </div>
-
-    <div class="menu-item" onclick="go('cozinha.html')">
-        <i class="fas fa-kitchen-set"></i> Cozinha
-    </div>
-
-    <div class="menu-item active" onclick="go('caixa.html')">
-        <i class="fas fa-cash-register"></i> Caixa
-    </div>
-
-    <div class="menu-item" onclick="go('colaboradores.html')">
-        <i class="fas fa-users"></i> Colaboradores
-    </div>
-
-    <div class="menu-item" onclick="logout()">
-        <i class="fas fa-door-open"></i> Sair
-    </div>
+    <div class="menu-item" onclick="go('dashboard.html')"><i class="fas fa-chart-line"></i> Dashboard</div>
+    <div class="menu-item" onclick="go('produtos.html')"><i class="fas fa-mug-hot"></i> Produtos</div>
+    <div class="menu-item" onclick="go('cozinha.html')"><i class="fas fa-kitchen-set"></i> Cozinha</div>
+    <div class="menu-item active" onclick="go('caixa.html')"><i class="fas fa-cash-register"></i> Caixa</div>
+    <div class="menu-item" onclick="go('colaboradores.html')"><i class="fas fa-users"></i> Colaboradores</div>
+    <div class="menu-item" onclick="logout()"><i class="fas fa-door-open"></i> Sair</div>
 </div>
 
 <div class="content">
-
-    <h1 class="title">
-        <i class="fas fa-cash-register"></i> Pedidos do Caixa
-    </h1>
-
+    <h1 class="title"><i class="fas fa-cash-register"></i> Pedidos do Caixa</h1>
     <div id="lista"></div>
-
 </div>
 
 <script type="module">
-
-/* 🔥 IMPORTAÇÃO CORRETA PARA O GITHUB PAGES */
+// 🔥 IMPORTAÇÃO CORRETA DO FIREBASE
 import { auth, db } 
 from "https://rapha0904.github.io/MAVA-BRISTRO/ADMINISTRATIVO/firebase.js";
 
@@ -117,26 +92,27 @@ import {
     update
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* LOGIN */
+// Proteção
 onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "login.html";
 });
 window.logout = () => signOut(auth);
 
-/* LISTAR PEDIDOS PRONTOS */
+// LISTA
 const lista = document.getElementById("lista");
 
+// 🔥 SEM FILTRO DE deviceId
 onValue(ref(db, "pedidos"), snap => {
 
     lista.innerHTML = "";
 
     snap.forEach(item => {
-        
+
         const p = item.val();
         const id = item.key;
 
         if (!p) return;
-        if (p.status !== "pronto") return;
+        if (p.status !== "pronto") return; // APENAS PRONTOS
 
         lista.innerHTML += `
             <div class="pedido-card">
@@ -157,8 +133,7 @@ onValue(ref(db, "pedidos"), snap => {
                     <option value="Crédito">Crédito</option>
                 </select>
 
-                <button class="finalizar-btn"
-                    onclick="finalizar('${id}')">
+                <button class="finalizar-btn" onclick="finalizar('${id}')">
                     <i class="fas fa-check-circle"></i> Finalizar Pedido
                 </button>
             </div>
@@ -166,7 +141,7 @@ onValue(ref(db, "pedidos"), snap => {
     });
 });
 
-/* FINALIZAR PEDIDO */
+// FINALIZAR
 window.finalizar = id => {
 
     const forma = document.getElementById("pg-" + id).value;
