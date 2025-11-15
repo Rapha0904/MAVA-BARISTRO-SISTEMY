@@ -31,7 +31,7 @@
     color:var(--azul);
     margin-bottom:6px;
     font-size:20px;
-    font-weight:bold;
+    font-weight: bold;
 }
 
 .pedido-card ul{
@@ -40,7 +40,7 @@
     font-size:15px;
 }
 
-/* TAGS */
+/* TAGS DE PAGAMENTO */
 .pay-tags{
     display:flex;
     gap:8px;
@@ -75,7 +75,7 @@
     margin-top:10px;
 }
 
-/* BOTÃO */
+/* BOTÃO FINALIZAR */
 .finalizar-btn{
     margin-top:15px;
     width:100%;
@@ -93,12 +93,19 @@
 .finalizar-btn:hover{
     background:#0d153b;
 }
+
+/* MOBILE */
+@media(max-width:600px){
+    .pedido-card{ padding:16px; }
+    .finalizar-btn{ font-size:15px; }
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- BOTÃO MENU MOBILE -->
+<!-- BOTÃO MOBILE -->
 <div class="menu-toggle" onclick="toggleMenu()">
     <i class="fas fa-bars"></i>
 </div>
@@ -145,9 +152,10 @@
 </div>
 
 <script type="module">
-
-/* ============================= IMPORTAÇÃO CERTA ============================= */
-import { auth, db } from "https://rapha0904.github.io/MAVA-BRISTRO/ADMINISTRATIVO/firebase.js";
+/* ============================= FIREBASE ============================= */
+/* 🔥 IMPORTAÇÃO CORRETA PARA GITHUB PAGES */
+import { auth, db }
+from "https://rapha0904.github.io/MAVA-BRISTRO/ADMINISTRATIVO/firebase.js";
 
 import { onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -164,7 +172,7 @@ onAuthStateChanged(auth, user => {
 });
 window.logout = () => signOut(auth);
 
-/* =================== PEGAR ID DO CLIENTE =================== */
+/* ============== PEGAR ID DO DISPOSITIVO DO CLIENTE ============== */
 let deviceId = localStorage.getItem("deviceId");
 if (!deviceId) {
     deviceId = "dev-" + Math.random().toString(36).substr(2, 9);
@@ -184,6 +192,7 @@ onValue(ref(db, "pedidos"), snap => {
 
         if (!p) return;
 
+        /* SOMENTE PEDIDOS PRONTOS + DISPOSITIVO CERTO */
         if (p.status !== "pronto") return;
         if (p.deviceId !== deviceId) return;
 
@@ -195,7 +204,9 @@ onValue(ref(db, "pedidos"), snap => {
                 <p><b>Horário:</b> ${hora}</p>
 
                 <p><b>Itens:</b></p>
-                <ul>${p.itens.map(i => `<li>${i}</li>`).join("")}</ul>
+                <ul>
+                    ${p.itens.map(i => `<li>${i}</li>`).join("")}
+                </ul>
 
                 <p style="margin-top:10px;font-size:16px;">
                     <b>Total:</b> R$ ${p.total.toFixed(2)}
@@ -217,7 +228,8 @@ onValue(ref(db, "pedidos"), snap => {
                     <span class="pay-tag"><i class="fas fa-utensils"></i> VR</span>
                 </div>
 
-                <button class="finalizar-btn" onclick="finalizar('${id}')">
+                <button class="finalizar-btn"
+                    onclick="finalizar('${id}')">
                     <i class="fas fa-check-circle"></i> Finalizar Pedido
                 </button>
             </div>
@@ -240,9 +252,8 @@ window.finalizar = id => {
         pagamento: forma
     });
 
-    alert("Pedido finalizado!");
+    alert("Pedido finalizado com sucesso!");
 };
-
 </script>
 
 <script>
