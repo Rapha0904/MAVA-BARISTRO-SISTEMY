@@ -15,6 +15,7 @@
     --dourado:#b88a55;
     --cinza:#f4f4f4;
     --branco:#ffffff;
+    --gold-light: #ccaa77;
 }
 
 /* GLOBAL */
@@ -28,9 +29,10 @@
 body{
     background:var(--cinza);
     color:var(--azul);
+    overflow-x:hidden;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 header{
     background:var(--azul);
     color:var(--dourado);
@@ -47,6 +49,11 @@ header img{
     border-radius:50%;
     border:3px solid var(--dourado);
     object-fit:cover;
+    transition: .3s;
+}
+
+header img:hover{
+    transform:scale(1.05);
 }
 
 header h1{
@@ -54,7 +61,7 @@ header h1{
     font-weight:bold;
 }
 
-/* CATEGORIAS */
+/* ================= CATEGORIAS ================= */
 .nav{
     background:white;
     display:flex;
@@ -63,6 +70,7 @@ header h1{
     padding:10px;
     gap:15px;
     border-bottom:2px solid var(--dourado);
+    animation: fadeIn .6s ease;
 }
 
 .nav button{
@@ -73,13 +81,35 @@ header h1{
     font-weight:bold;
     cursor:pointer;
     padding:6px 10px;
+    transition:.3s;
+}
+
+.nav button:hover{
+    color:var(--dourado);
 }
 
 .nav button.active{
     border-bottom:3px solid var(--dourado);
 }
 
-/* GRID RESPONSIVA */
+/* ============= ANIMAÇÕES SUAVES ============= */
+
+@keyframes fadeIn {
+    from {opacity:0; transform:translateY(10px);}
+    to {opacity:1; transform:translateY(0);}
+}
+
+.card{
+    animation: cardEnter .5s ease forwards;
+    opacity:0;
+}
+
+@keyframes cardEnter {
+    from {opacity:0; transform: translateY(15px);}
+    to {opacity:1; transform: translateY(0);}
+}
+
+/* ================= GRID ================= */
 .menu-grid{
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -87,21 +117,23 @@ header h1{
     padding:15px;
 }
 
-/* CARD PRODUTO */
+/* ================= CARD PRODUTO ================= */
 .card{
     background:white;
     border-radius:14px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
     padding:12px;
     border:2px solid var(--dourado);
     text-align:center;
-    transition:.3s;
+    transition: .3s;
     max-width:260px;
     margin:0 auto;
 }
 
 .card:hover{
     transform:translateY(-6px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+    border-color:var(--gold-light);
 }
 
 .card img{
@@ -110,6 +142,11 @@ header h1{
     object-fit:cover;
     border-radius:10px;
     margin-bottom:8px;
+    transition:.3s;
+}
+
+.card img:hover{
+    transform:scale(1.03);
 }
 
 .card h3{
@@ -117,34 +154,90 @@ header h1{
     margin-bottom:6px;
 }
 
-/* CARRINHO */
+/* ------- Botão Adicionar Premium ------- */
+.card button.add{
+    background:var(--dourado);
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:8px;
+    width:100%;
+    color:white;
+    font-size:15px;
+    transition:.2s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.card button.add:hover{
+    background:var(--gold-light);
+    transform:scale(1.04);
+}
+
+.card button.add:active{
+    transform:scale(.96);
+}
+
+/* =================== CARRINHO =================== */
 #carrinho{
     position:fixed;
     right:0;
     top:0;
-    width:300px;
+    width:330px;
     height:100vh;
     background:white;
     border-left:4px solid var(--dourado);
     padding:20px;
     transform:translateX(100%);
-    transition:.4s;
+    transition: .45s cubic-bezier(0.25, 0.8, 0.25, 1);
     overflow-y:auto;
     z-index:999;
+    box-shadow:-4px 0 15px rgba(0,0,0,0.15);
+    backdrop-filter: blur(3px);
+}
+
+#carrinho h2{
+    text-align:center;
+    color:var(--azul);
+    font-size:22px;
+    margin-bottom:15px;
+    font-weight:bold;
+}
+
+/* Itens animados */
+#lista-itens li{
+    background:#fafafa;
+    margin:5px 0;
+    padding:8px;
+    border-radius:6px;
+    border-left:4px solid var(--dourado);
+    list-style:none;
+    animation:itemAdd .4s ease;
+}
+
+@keyframes itemAdd {
+    from {opacity:0; transform:translateX(-10px);}
+    to {opacity:1; transform:translateX(0);}
 }
 
 #btn-carrinho{
     position:fixed;
     right:15px;
     top:15px;
-    background:var(--azul);
-    color:var(--dourado);
+    background:var(--dourado);
+    color:white;
     padding:12px 16px;
-    border-radius:50px;
+    border-radius:50%;
     cursor:pointer;
     z-index:1000;
     font-size:22px;
     box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    transition:.3s;
+}
+
+#btn-carrinho:hover{
+    transform:scale(1.1);
 }
 
 .confirmar-btn{
@@ -156,56 +249,27 @@ header h1{
     border-radius:10px;
     margin-top:15px;
     font-weight:bold;
+    font-size:17px;
     cursor:pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.confirmar-btn:hover{
+    background:#111739;
 }
 
 /* =================== RESPONSIVIDADE =================== */
 
-/* Celulares pequenos */
 @media (max-width: 480px){
-
     header{
         flex-direction:column;
         text-align:center;
     }
-
-    header h1{
-        font-size:18px;
-    }
-
     .menu-grid{
-        grid-template-columns: 1fr;
-        padding:10px;
+        grid-template-columns:1fr;
     }
-
-    #btn-carrinho{
-        top:10px;
-        right:10px;
-        padding:10px 14px;
-        font-size:20px;
-    }
-
     #carrinho{
-        width:90%;
-    }
-}
-
-/* Celulares maiores */
-@media (min-width: 481px) and (max-width: 768px){
-    .menu-grid{
-        grid-template-columns: repeat(2, 1fr);
-        gap:15px;
-    }
-
-    header{
-        padding:12px;
-    }
-}
-
-/* Tablets */
-@media (min-width: 769px) and (max-width: 1024px){
-    .menu-grid{
-        grid-template-columns: repeat(3, 1fr);
+        width:92%;
     }
 }
 </style>
@@ -243,6 +307,13 @@ header h1{
 </div>
 
 <script type="module">
+/* ================= DEVICE ID ================= */
+let deviceId = localStorage.getItem("deviceId");
+if (!deviceId) {
+    deviceId = "dev-" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("deviceId", deviceId);
+}
+
 import { db } from "./ADMINISTRATIVO/firebase.js";
 import { ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -270,12 +341,14 @@ function carregarProdutos(){
     onValue(ref(db,"produtos"), snap=>{
         grid.innerHTML = "";
 
+        let delay = 0;
+
         snap.forEach(item=>{
             const p = item.val();
             if(p.categoria !== categoriaAtual) return;
 
             grid.innerHTML += `
-                <div class="card">
+                <div class="card" style="animation-delay:${delay}s">
                     <img src="${p.foto}">
                     <h3>${p.nome}</h3>
                     <p>R$ ${p.preco}</p>
@@ -284,10 +357,12 @@ function carregarProdutos(){
                     <button class="add"
                      data-nome="${p.nome}"
                      data-preco="${p.preco}">
-                        Adicionar
+                        <i class="fas fa-plus"></i> Adicionar
                     </button>
                 </div>
             `;
+
+            delay += 0.08; /* Delay em cascata */
         });
 
         ativarBotoes();
@@ -314,6 +389,7 @@ function ativarBotoes(){
     });
 }
 
+/* MESA */
 const selectMesa = document.getElementById("mesa");
 for(let i=1;i<=25;i++){
     let op = document.createElement("option");
@@ -322,7 +398,9 @@ for(let i=1;i<=25;i++){
     selectMesa.appendChild(op);
 }
 
+/* ENVIAR PEDIDO */
 document.getElementById("confirmar").onclick = ()=>{
+
     const mesa = selectMesa.value;
     if(!mesa){
         alert("Selecione a mesa!");
@@ -337,10 +415,12 @@ document.getElementById("confirmar").onclick = ()=>{
         itens,
         total,
         status:"novo",
-        hora:Date.now()
+        hora:Date.now(),
+        deviceId: deviceId
     };
 
     push(ref(db,"pedidos"), pedido);
+
     alert("Pedido enviado!");
     location.reload();
 };
