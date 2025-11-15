@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Mava Baristro</title>
+
+<style>
+/* PALETA */
+:root {
+    --azul:#0a0f2e;
+    --dourado:#b88a55;
+    --branco:#ffffff;
+}
+
+/* FUNDO */
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(125deg, var(--azul), #141c42, #0a0f2e);
+    font-family:Arial, sans-serif;
+}
+
+/* CARD */
+.box{
+    background:var(--branco);
+    padding:35px;
+    width:350px;
+    border-radius:16px;
+    box-shadow:0 0 18px rgba(0,0,0,0.3);
+    text-align:center;
+    border:3px solid var(--dourado);
+    animation:fade 0.6s ease;
+}
+
+@keyframes fade{
+    from{opacity:0; transform:translateY(25px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* LOGO */
+.box img{
+    width:95px;
+    height:95px;
+    border-radius:50%;
+    border:3px solid var(--dourado);
+    margin-bottom:15px;
+    object-fit:cover;
+}
+
+/* TÍTULO */
+.box h2{
+    color:var(--azul);
+    margin-bottom:20px;
+    font-size:23px;
+}
+
+/* INPUTS */
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:10px;
+    border:2px solid #ccc;
+    font-size:15px;
+    transition:0.2s;
+}
+
+input:focus{
+    border-color:var(--dourado);
+    outline:none;
+}
+
+/* BOTÃO */
+button{
+    width:100%;
+    margin-top:18px;
+    padding:12px;
+    background:var(--azul);
+    color:var(--dourado);
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+    box-shadow:0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* ERRO */
+#erro{
+    color:#b40000;
+    margin-top:12px;
+    font-size:14px;
+    font-weight:bold;
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <img src="logo_mava_baristro.png" alt="Logo">
+    <h2>Login do Administrador</h2>
+
+    <input id="email" type="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button id="btn-login">Entrar</button>
+
+    <p id="erro"></p>
+</div>
+
+<script type="module">
+/* ===== IMPORT CORRIGIDO PARA SUA ESTRUTURA ===== */
+import { auth } from "./ADMINISTRATIVO/firebase.js";
+import { signInWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+document.getElementById("btn-login").onclick = () => {
+
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value.trim();
+    const erro = document.getElementById("erro");
+
+    erro.style.display = "none";
+
+    if(!email || !senha){
+        erro.textContent = "Preencha todos os campos!";
+        erro.style.display = "block";
+        return;
+    }
+
+    signInWithEmailAndPassword(auth, email, senha)
+    .then(() => {
+        /* ===== REDIRECIONAMENTO CORRIGIDO ===== */
+        window.location.href = "./ADMINISTRATIVO/dashboard.html";
+    })
+    .catch((e) => {
+        console.log(e);
+        erro.textContent = "Email ou senha incorretos!";
+        erro.style.display = "block";
+    });
+};
+</script>
+
+</body>
+</html>

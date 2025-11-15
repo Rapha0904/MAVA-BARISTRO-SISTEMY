@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardápio - Mava Baristro</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* PALETA */
+:root{
+    --azul:#0a0f2e;
+    --dourado:#b88a55;
+    --cinza:#f4f4f4;
+    --branco:#ffffff;
+}
+
+/* GLOBAL */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:var(--cinza);
+    color:var(--azul);
+}
+
+/* HEADER */
+header{
+    background:var(--azul);
+    color:var(--dourado);
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    border-bottom:4px solid var(--dourado);
+}
+
+header img{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    border:3px solid var(--dourado);
+    object-fit:cover;
+}
+
+header h1{
+    font-size:26px;
+    font-weight:bold;
+}
+
+/* CATEGORIAS */
+.nav{
+    background:white;
+    display:flex;
+    justify-content:center;
+    padding:10px;
+    gap:25px;
+    border-bottom:2px solid var(--dourado);
+}
+
+.nav button{
+    background:none;
+    border:none;
+    color:var(--azul);
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    padding:6px 12px;
+}
+
+.nav button.active{
+    border-bottom:3px solid var(--dourado);
+}
+
+/* GRID AJUSTADA PARA 4 CARDS POR LINHA */
+.menu-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap:25px;
+    padding:20px;
+}
+
+/* CARD PRODUTO */
+.card{
+    background:white;
+    border-radius:14px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    padding:15px;
+    border:2px solid var(--dourado);
+    text-align:center;
+    transition:.3s;
+    max-width:260px; /* NOVO: limita o tamanho */
+    margin:0 auto;  /* NOVO: centraliza */
+}
+
+.card:hover{
+    transform:translateY(-6px);
+}
+
+/* IMAGEM DO PRODUTO 600x400 AJUSTADA */
+.card img{
+    width:100%;
+    height:160px;        /* altura fixa elegante */
+    object-fit:cover;    /* RECORTA mantendo layout */
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.card h3{
+    color:var(--azul);
+    margin-bottom:8px;
+}
+
+/* CARRINHO */
+#carrinho{
+    position:fixed;
+    right:0;
+    top:0;
+    width:330px;
+    height:100vh;
+    background:white;
+    border-left:4px solid var(--dourado);
+    padding:20px;
+    transform:translateX(100%);
+    transition:.4s;
+    overflow-y:auto;
+    z-index:999;
+}
+
+#btn-carrinho{
+    position:fixed;
+    right:20px;
+    top:20px;
+    background:var(--azul);
+    color:var(--dourado);
+    padding:12px 18px;
+    border-radius:50px;
+    cursor:pointer;
+    z-index:1000;
+    font-size:23px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.25);
+}
+
+.confirmar-btn{
+    background:var(--azul);
+    color:var(--dourado);
+    width:100%;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    margin-top:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <img src="logo_mava_baristro.png">
+    <h1>Mava Baristro - Cardápio</h1>
+</header>
+
+<!-- BOTÃO DO CARRINHO -->
+<div id="btn-carrinho"><i class="fas fa-shopping-cart"></i></div>
+
+<!-- CATEGORIAS -->
+<div class="nav">
+    <button class="active" data-cat="cafes">Cafés</button>
+    <button data-cat="bebidas">Bebidas</button>
+    <button data-cat="doces">Doces</button>
+    <button data-cat="salgados">Salgados</button>
+</div>
+
+<!-- GRID DE PRODUTOS -->
+<div class="menu-grid" id="grid"></div>
+
+<!-- CARRINHO -->
+<div id="carrinho">
+    <h2>Carrinho</h2>
+    <ul id="lista-itens"></ul>
+    <h3 id="total" style="margin-top:15px;">Total: R$ 0,00</h3>
+
+    <label>Mesa:</label>
+    <select id="mesa" style="width:100%;padding:10px;border-radius:8px;border:1px solid #aaa;">
+        <option value="">Selecione</option>
+    </select>
+
+    <button class="confirmar-btn" id="confirmar">Confirmar Pedido</button>
+</div>
+
+<script type="module">
+/* IMPORTAÇÃO */
+import { db } from "./ADMINISTRATIVO/firebase.js";
+import { ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+/* === ABRIR / FECHAR CARRINHO === */
+const painel = document.getElementById("carrinho");
+document.getElementById("btn-carrinho").onclick = () => {
+    painel.style.transform =
+        painel.style.transform === "translateX(0%)"
+        ? "translateX(100%)"
+        : "translateX(0%)";
+};
+
+/* === CATEGORIAS === */
+let categoriaAtual = "cafes";
+const grid = document.getElementById("grid");
+
+document.querySelectorAll(".nav button").forEach(btn=>{
+    btn.onclick = ()=>{
+        document.querySelectorAll(".nav button").forEach(b=> b.classList.remove("active"));
+        btn.classList.add("active");
+        categoriaAtual = btn.dataset.cat;
+        carregarProdutos();
+    };
+});
+
+/* === CARREGAR PRODUTOS === */
+function carregarProdutos(){
+    onValue(ref(db,"produtos"), snap=>{
+        grid.innerHTML = "";
+
+        snap.forEach(item=>{
+            const p = item.val();
+
+            if(p.categoria !== categoriaAtual) return;
+
+            grid.innerHTML += `
+                <div class="card">
+                    <img src="${p.foto}">
+                    <h3>${p.nome}</h3>
+                    <p>R$ ${p.preco}</p>
+                    <p>${p.quantidade || ""}</p>
+
+                    <button class="add"
+                     data-nome="${p.nome}"
+                     data-preco="${p.preco}">
+                        Adicionar
+                    </button>
+                </div>
+            `;
+        });
+
+        ativarBotoes();
+    });
+}
+carregarProdutos();
+
+/* === CARRINHO === */
+let total = 0;
+const ul = document.getElementById("lista-itens");
+
+function ativarBotoes(){
+    document.querySelectorAll(".add").forEach(btn=>{
+        btn.onclick = ()=>{
+            const nome = btn.dataset.nome;
+            const preco = parseFloat(btn.dataset.preco);
+
+            total += preco;
+            document.getElementById("total").innerText = `Total: R$ ${total.toFixed(2)}`;
+
+            const li = document.createElement("li");
+            li.innerText = `${nome} — R$ ${preco.toFixed(2)}`;
+            ul.appendChild(li);
+        };
+    });
+}
+
+/* === MESAS === */
+const selectMesa = document.getElementById("mesa");
+for(let i=1;i<=25;i++){
+    let op = document.createElement("option");
+    op.value=i;
+    op.innerText="Mesa "+i;
+    selectMesa.appendChild(op);
+}
+
+/* === ENVIAR PEDIDO === */
+document.getElementById("confirmar").onclick = ()=>{
+
+    const mesa = selectMesa.value;
+    if(!mesa){
+        alert("Selecione a mesa!");
+        return;
+    }
+
+    const itens = [];
+    ul.querySelectorAll("li").forEach(li=> itens.push(li.innerText));
+
+    const pedido = {
+        mesa,
+        itens,
+        total,
+        status:"novo",
+        hora:Date.now()
+    };
+
+    push(ref(db,"pedidos"), pedido);
+
+    alert("Pedido enviado!");
+    location.reload();
+};
+</script>
+
+</body>
+</html>
