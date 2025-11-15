@@ -10,53 +10,106 @@
  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+
+/* =================== ESTILO DOS CARDS =================== */
 .pedido-card{
     background:white;
-    border-radius:12px;
-    padding:18px;
-    margin-bottom:15px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.12);
+    border:2px solid var(--dourado);
+    transition:.3s;
 }
+
+.pedido-card:hover{
+    transform: translateY(-4px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+}
+
 .pedido-card h3{
     color:var(--azul);
     margin-bottom:6px;
+    font-size:20px;
+    font-weight: bold;
 }
+
 .pedido-card ul{
-    padding-left:18px;
-    margin-top:5px;
+    padding-left:20px;
+    margin-top:6px;
+    font-size:15px;
 }
-.pay-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:10px;
-}
-.pay-select{
-    flex:1;
-}
+
+/* TAGS DE PAGAMENTO */
 .pay-tags{
     display:flex;
-    gap:6px;
+    gap:8px;
     font-size:14px;
-    margin-top:6px;
+    margin-top:10px;
+    flex-wrap:wrap;
 }
+
 .pay-tag{
-    padding:3px 8px;
-    border-radius:999px;
-    background:#f0f0f0;
+    padding:6px 12px;
+    border-radius:50px;
+    background:#f2f2f2;
+    color:var(--azul);
     display:flex;
     align-items:center;
-    gap:5px;
+    gap:6px;
+    font-weight:bold;
+    border:1px solid #ddd;
+    transition:.2s;
 }
-.pay-tag i{
-    font-size:13px;
+
+.pay-tag:hover{
+    background:#e8e8e8;
 }
+
+/* SELECT */
+.pay-select{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #aaa;
+    margin-top:10px;
+}
+
+/* BOTÃO FINALIZAR */
+.finalizar-btn{
+    margin-top:15px;
+    width:100%;
+    padding:12px;
+    background:var(--azul);
+    color:var(--dourado);
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.finalizar-btn:hover{
+    background:#0d153b;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    .pedido-card{
+        padding:16px;
+    }
+    .finalizar-btn{
+        font-size:15px;
+    }
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- BOTÃO MENU MOBILE -->
+<!-- BOTÃO MOBILE -->
 <div class="menu-toggle" onclick="toggleMenu()">
     <i class="fas fa-bars"></i>
 </div>
@@ -78,7 +131,7 @@
         <i class="fas fa-kitchen-set"></i> Cozinha
     </div>
 
-    <div class="menu-item" onclick="go('caixa.html')">
+    <div class="menu-item active" onclick="go('caixa.html')">
         <i class="fas fa-cash-register"></i> Caixa
     </div>
 
@@ -104,7 +157,7 @@
 
 <script type="module">
 /* ============================= FIREBASE ============================= */
-import { auth, db } from "./firebase.js";
+import { auth, db } from "../firebase.js";   /* CORRIGIDO! */
 import { onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -114,22 +167,20 @@ import {
     update
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ============================= PROTEÇÃO ============================= */
+/* PROTEÇÃO */
 onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "../login.html";
 });
 window.logout = () => signOut(auth);
 
-/* ============== PEGAR DEVICE DO CLIENTE ============== */
+/* ============== PEGAR ID DO DISPOSITIVO DO CLIENTE ============== */
 let deviceId = localStorage.getItem("deviceId");
-
 if (!deviceId) {
-    // caso abra no caixa antes do cliente pedir
     deviceId = "dev-" + Math.random().toString(36).substr(2, 9);
     localStorage.setItem("deviceId", deviceId);
 }
 
-/* ============================= LISTAR PEDIDOS PRONTOS ============================= */
+/* LISTAR PEDIDOS PRONTOS */
 const lista = document.getElementById("lista");
 
 onValue(ref(db, "pedidos"), snap => {
@@ -142,7 +193,7 @@ onValue(ref(db, "pedidos"), snap => {
 
         if (!p) return;
 
-        // Mostrar apenas pedidos PRONTOS deste dispositivo
+        // SOMENTE PEDIDOS PRONTOS E DO MESMO DISPOSITIVO
         if (p.status !== "pronto") return;
         if (p.deviceId !== deviceId) return;
 
@@ -158,20 +209,18 @@ onValue(ref(db, "pedidos"), snap => {
                     ${p.itens.map(i => `<li>${i}</li>`).join("")}
                 </ul>
 
-                <p style="margin-top:8px;">
+                <p style="margin-top:10px;font-size:16px;">
                     <b>Total:</b> R$ ${p.total.toFixed(2)}
                 </p>
 
-                <div class="pay-row">
-                    <select id="pg-${id}" class="pay-select">
-                        <option value="">Selecione a forma de pagamento</option>
-                        <option value="Dinheiro">Dinheiro</option>
-                        <option value="Pix">Pix</option>
-                        <option value="Cartão Débito">Cartão Débito</option>
-                        <option value="Cartão Crédito">Cartão Crédito</option>
-                        <option value="Vale Refeição">Vale Refeição</option>
-                    </select>
-                </div>
+                <select id="pg-${id}" class="pay-select">
+                    <option value="">Selecione a forma de pagamento</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Pix">Pix</option>
+                    <option value="Cartão Débito">Cartão Débito</option>
+                    <option value="Cartão Crédito">Cartão Crédito</option>
+                    <option value="Vale Refeição">Vale Refeição</option>
+                </select>
 
                 <div class="pay-tags">
                     <span class="pay-tag"><i class="fas fa-money-bill-wave"></i> Dinheiro</span>
@@ -180,7 +229,7 @@ onValue(ref(db, "pedidos"), snap => {
                     <span class="pay-tag"><i class="fas fa-utensils"></i> VR</span>
                 </div>
 
-                <button class="btn btn-primary" style="margin-top:12px;"
+                <button class="finalizar-btn"
                     onclick="finalizar('${id}')">
                     <i class="fas fa-check-circle"></i> Finalizar Pedido
                 </button>
@@ -189,11 +238,10 @@ onValue(ref(db, "pedidos"), snap => {
     });
 });
 
-/* ============================= FINALIZAR PEDIDO ============================= */
+/* FINALIZAR PEDIDO */
 window.finalizar = id => {
 
-    const select = document.getElementById("pg-" + id);
-    const forma = select ? select.value : "";
+    const forma = document.getElementById("pg-" + id).value;
 
     if(!forma){
         alert("Selecione a forma de pagamento!");
