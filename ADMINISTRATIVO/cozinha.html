@@ -10,8 +10,6 @@
  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
-/* BADGES */
 .status-badge{
     display:inline-block;
     padding:6px 12px;
@@ -23,7 +21,6 @@
 .status-prep{ background:#f0ad4e; color:white; }
 .status-pronto{ background:#5cb85c; color:white; }
 
-/* CARTÃO DO PEDIDO */
 .pedido-card{
     background:white;
     border-radius:12px;
@@ -33,7 +30,6 @@
     transition:.3s;
 }
 
-/* PISCAR NOVO PEDIDO */
 @keyframes piscar {
     0%{background-color:#fff6c7;}
     50%{background-color:#ffeaa7;}
@@ -43,7 +39,6 @@
     animation: piscar 1s ease-in-out 3;
 }
 
-/* POPUP */
 .popup-alert {
     position: fixed;
     right: 20px;
@@ -58,7 +53,6 @@
     animation: aparecer .4s ease;
     z-index: 9999;
 }
-
 @keyframes aparecer {
     from {opacity: 0; transform: translateY(20px);}
     to {opacity: 1; transform: translateY(0);}
@@ -68,14 +62,11 @@
 
 <body>
 
-<!-- MENU MOBILE -->
 <div class="menu-toggle" onclick="toggleMenu()">
     <i class="fas fa-bars"></i>
 </div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-
     <h2>Mava Baristro</h2>
 
     <div class="menu-item" onclick="go('dashboard.html')">
@@ -86,16 +77,8 @@
         <i class="fas fa-mug-hot"></i> Produtos
     </div>
 
-    <div class="menu-item" id="cozinhaMenu" onclick="go('cozinha.html')">
+    <div class="menu-item active" onclick="go('cozinha.html')">
         <i class="fas fa-kitchen-set"></i> Cozinha 
-        <span id="badgeCozinha" style="
-            display:none;
-            background:#d9534f;
-            color:white;
-            padding:2px 8px;
-            border-radius:10px;
-            font-size:12px;
-            margin-left:6px;">!</span>
     </div>
 
     <div class="menu-item" onclick="go('caixa.html')">
@@ -111,7 +94,6 @@
     </div>
 </div>
 
-<!-- CONTEÚDO -->
 <div class="content">
 
     <h1 class="title">
@@ -122,16 +104,10 @@
 
 </div>
 
-<!-- ÁUDIO DO ALERTA -->
 <audio id="alertSound" src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3" preload="auto"></audio>
 
-<!-- POPUP -->
 <div id="popup" class="popup-alert"></div>
 
-
-<!-- ======================================= -->
-<!-- ======= DESBLOQUEAR ÁUDIO ============ -->
-<!-- ======================================= -->
 <script>
 document.addEventListener("click", function liberarAudio() {
     const audio = document.getElementById("alertSound");
@@ -140,15 +116,11 @@ document.addEventListener("click", function liberarAudio() {
 });
 </script>
 
-
-<!-- ======================================= -->
-<!-- =============== FIREBASE ============== -->
-<!-- ======================================= -->
-
 <script type="module">
 
-/* 🔥 IMPORTAÇÃO CERTA PARA GITHUB PAGES 🔥 */
-import { auth, db } from "https://rapha0904.github.io/MAVA-BRISTRO/ADMINISTRATIVO/firebase.js";
+/* 🔥 IMPORTAÇÃO CORRETA PARA GITHUB PAGES */
+import { auth, db }
+from "https://rapha0904.github.io/MAVA-BRISTRO/ADMINISTRATIVO/firebase.js";
 
 import { onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -159,33 +131,28 @@ import {
     update
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ================= PROTEÇÃO ================= */
+
 onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "../login.html";
 });
 window.logout = () => signOut(auth);
 
 
-/* ================= ELEMENTOS ================= */
 const lista = document.getElementById("lista");
 const popup = document.getElementById("popup");
-const badge = document.getElementById("badgeCozinha");
 const alertSound = document.getElementById("alertSound");
 
 let primeiraVez = true;
 let ultimoId = null;
 
-
-/* ================= LISTAR PEDIDOS ================= */
 onValue(ref(db, "pedidos"), snap => {
 
     const pedidos = [];
     snap.forEach(item => {
         const p = item.val();
         const id = item.key;
-        if (p.status !== "finalizado") {
+        if (p.status !== "finalizado")
             pedidos.push({ id, ...p });
-        }
     });
 
     pedidos.sort((a, b) => {
@@ -193,7 +160,6 @@ onValue(ref(db, "pedidos"), snap => {
         return ordem[a.status] - ordem[b.status] || a.hora - b.hora;
     });
 
-    /* Detectar novo pedido */
     if (!primeiraVez) {
         const novoPedido = pedidos.find(p => p.status === "novo");
 
@@ -206,18 +172,13 @@ onValue(ref(db, "pedidos"), snap => {
             popup.style.display = "block";
             setTimeout(()=> popup.style.display = "none", 4000);
 
-            badge.style.display = "inline-block";
-
-            setTimeout(() => {
-                const card = document.getElementById("pedido-" + novoPedido.id);
-                if (card) card.classList.add("pedido-novo-flash");
-            }, 300);
+            const card = document.getElementById("pedido-" + novoPedido.id);
+            if (card) card.classList.add("pedido-novo-flash");
         }
     }
 
     primeiraVez = false;
 
-    /* RENDERIZAR PÁGINA */
     lista.innerHTML = "";
 
     pedidos.forEach(p => {
@@ -259,15 +220,9 @@ onValue(ref(db, "pedidos"), snap => {
 });
 
 
-/* BOTÕES */
-window.preparar = id => {
-    update(ref(db, "pedidos/" + id), { status: "preparando" });
-    badge.style.display = "none";
-};
+window.preparar = id => update(ref(db, "pedidos/" + id), { status: "preparando" });
 
-window.pronto = id => {
-    update(ref(db, "pedidos/" + id), { status: "pronto" });
-};
+window.pronto = id => update(ref(db, "pedidos/" + id), { status: "pronto" });
 
 </script>
 
