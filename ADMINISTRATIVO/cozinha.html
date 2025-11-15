@@ -126,9 +126,31 @@
 <div id="popup" class="popup-alert"></div>
 
 
-<!-- ===================================================== -->
-<!-- ====================== FIREBASE ===================== -->
-<!-- ===================================================== -->
+<!-- ======================================= -->
+<!-- ======= DESBLOQUEAR ÁUDIO ============ -->
+<!-- ======================================= -->
+<script>
+document.addEventListener("click", function liberarAudio() {
+    const audio = document.getElementById("alertSound");
+
+    if (!audio) return;
+
+    audio.volume = 1;
+
+    audio.play().then(() => {
+        console.log("🔊 Áudio liberado!");
+    }).catch(() => {
+        console.log("Clique novamente para liberar o áudio…");
+    });
+
+    document.removeEventListener("click", liberarAudio);
+});
+</script>
+
+
+<!-- ======================================= -->
+<!-- =============== FIREBASE ============== -->
+<!-- ======================================= -->
 
 <script type="module">
 
@@ -183,7 +205,7 @@ onValue(ref(db, "pedidos"), snap => {
             
             ultimoId = maisRecente.id;
 
-            // SOM
+            // 🔊 SOM DO PEDIDO
             alertSound.play();
 
             // POPUP
