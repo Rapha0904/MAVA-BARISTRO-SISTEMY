@@ -94,12 +94,6 @@
     background:#0d153b;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-    .pedido-card{ padding:16px; }
-    .finalizar-btn{ font-size:15px; }
-}
-
 </style>
 </head>
 
@@ -152,8 +146,8 @@
 </div>
 
 <script type="module">
+
 /* ============================= FIREBASE ============================= */
-/* 🔥 IMPORTAÇÃO CORRETA PARA GITHUB PAGES */
 import { auth, db }
 from "https://rapha0904.github.io/MAVA-BRISTRO/ADMINISTRATIVO/firebase.js";
 
@@ -172,13 +166,6 @@ onAuthStateChanged(auth, user => {
 });
 window.logout = () => signOut(auth);
 
-/* ============== PEGAR ID DO DISPOSITIVO DO CLIENTE ============== */
-let deviceId = localStorage.getItem("deviceId");
-if (!deviceId) {
-    deviceId = "dev-" + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem("deviceId", deviceId);
-}
-
 /* ============================= LISTAR PEDIDOS ============================= */
 const lista = document.getElementById("lista");
 
@@ -187,14 +174,14 @@ onValue(ref(db, "pedidos"), snap => {
     lista.innerHTML = "";
 
     snap.forEach(item => {
+
         const p = item.val();
         const id = item.key;
 
         if (!p) return;
 
-        /* SOMENTE PEDIDOS PRONTOS + DISPOSITIVO CERTO */
+        /* Mostrar apenas pedidos prontos */
         if (p.status !== "pronto") return;
-        if (p.deviceId !== deviceId) return;
 
         const hora = new Date(p.hora).toLocaleTimeString("pt-BR");
 
@@ -204,9 +191,7 @@ onValue(ref(db, "pedidos"), snap => {
                 <p><b>Horário:</b> ${hora}</p>
 
                 <p><b>Itens:</b></p>
-                <ul>
-                    ${p.itens.map(i => `<li>${i}</li>`).join("")}
-                </ul>
+                <ul>${p.itens.map(i => `<li>${i}</li>`).join("")}</ul>
 
                 <p style="margin-top:10px;font-size:16px;">
                     <b>Total:</b> R$ ${p.total.toFixed(2)}
@@ -221,15 +206,7 @@ onValue(ref(db, "pedidos"), snap => {
                     <option value="Vale Refeição">Vale Refeição</option>
                 </select>
 
-                <div class="pay-tags">
-                    <span class="pay-tag"><i class="fas fa-money-bill-wave"></i> Dinheiro</span>
-                    <span class="pay-tag"><i class="fas fa-qrcode"></i> Pix</span>
-                    <span class="pay-tag"><i class="fas fa-credit-card"></i> Cartão</span>
-                    <span class="pay-tag"><i class="fas fa-utensils"></i> VR</span>
-                </div>
-
-                <button class="finalizar-btn"
-                    onclick="finalizar('${id}')">
+                <button class="finalizar-btn" onclick="finalizar('${id}')">
                     <i class="fas fa-check-circle"></i> Finalizar Pedido
                 </button>
             </div>
@@ -237,7 +214,7 @@ onValue(ref(db, "pedidos"), snap => {
     });
 });
 
-/* ============================= FINALIZAR PEDIDO ============================= */
+/* ============================= FINALIZAR ============================= */
 window.finalizar = id => {
 
     const forma = document.getElementById("pg-" + id).value;
@@ -254,6 +231,7 @@ window.finalizar = id => {
 
     alert("Pedido finalizado com sucesso!");
 };
+
 </script>
 
 <script>
