@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>QR Codes das Mesas - Mava Baristro</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    color:#0a0f2e;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    border-radius:14px;
+    text-align:center;
+    border:2px solid #b88a55;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.card h2{
+    margin-bottom:10px;
+    color:#0a0f2e;
+}
+
+.qr{
+    margin:auto;
+}
+</style>
+</head>
+
+<body>
+
+<h1>QR Codes - Mesas Mava Baristro</h1>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const grid = document.getElementById("grid");
+
+// MESAS A1 ATÉ A20
+for(let i = 1; i <= 20; i++){
+    const mesaId = "A" + i;
+    const url = `https://rapha0904.github.io/MAVA-BRISTRO/cardapio.html?mesa=${mesaId}`;
+
+    // Criar card
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+        <h2>Mesa ${mesaId}</h2>
+        <canvas id="qr-${mesaId}" class="qr"></canvas>
+        <p style="margin-top:10px;font-size:14px;color:#555;">
+            Aponte a câmera para acessar o cardápio
+        </p>
+    `;
+
+    grid.appendChild(div);
+
+    // Gerar QR CODE
+    new QRious({
+        element: document.getElementById(`qr-${mesaId}`),
+        value: url,
+        size: 200
+    });
+}
+</script>
+
+</body>
+</html>
