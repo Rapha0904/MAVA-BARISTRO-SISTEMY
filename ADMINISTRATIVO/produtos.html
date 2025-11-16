@@ -10,27 +10,93 @@
  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* Só um ajuste visual específico da página */
+
+/* -------- ESTILO ESPECIAL DA PÁGINA -------- */
+
+.card{
+    padding:22px;
+    border-radius:16px;
+    background:white;
+    box-shadow:0 4px 18px rgba(0,0,0,0.10);
+    border-left:6px solid var(--dourado);
+    margin-bottom:25px;
+}
+
+#titulo-form{
+    font-size:22px;
+    font-weight:bold;
+}
+
+input, textarea, select{
+    width:100%;
+    padding:12px;
+    font-size:15px;
+    border:1px solid #bbb;
+    border-radius:10px;
+    margin-bottom:12px;
+}
+
+textarea{
+    min-height:70px;
+    resize:none;
+}
+
+.btn-primary{
+    background:var(--azul);
+    color:white;
+    padding:12px 18px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.btn-primary:hover{
+    background:#0d153b;
+}
+
 .btn-edit{
     background:var(--dourado);
     color:white;
-    margin-right:8px;
 }
-.prod-img{
-    width:110px;
-    height:110px;
-    object-fit:cover;
-    border-radius:10px;
-}
-.prod-linha{
+
+.prod-card{
+    background:white;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.10);
     display:flex;
-    gap:18px;
-    padding:14px;
-    border-radius:10px;
-    background:#ffffff;
-    margin-bottom:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    gap:16px;
+    align-items:flex-start;
+    margin-bottom:16px;
+    transition:.25s;
 }
+
+.prod-card:hover{
+    transform:translateY(-4px);
+}
+
+.prod-img{
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid var(--dourado);
+}
+
+.prod-info h3{
+    margin-bottom:6px;
+    color:var(--azul);
+    font-size:20px;
+}
+
+.prod-info p{ margin:2px 0; }
+
+.prod-actions button{
+    margin-right:10px;
+}
+
 </style>
 </head>
 
@@ -50,8 +116,20 @@
         <i class="fas fa-chart-line"></i> Dashboard
     </div>
 
-    <div class="menu-item" onclick="go('produtos.html')">
+    <div class="menu-item active" onclick="go('produtos.html')">
         <i class="fas fa-mug-hot"></i> Produtos
+    </div>
+
+    <div class="menu-item" onclick="go('cozinha.html')">
+        <i class="fas fa-kitchen-set"></i> Cozinha
+    </div>
+
+    <div class="menu-item" onclick="go('caixa.html')">
+        <i class="fas fa-cash-register"></i> Caixa
+    </div>
+
+    <div class="menu-item" onclick="go('mesas.html')">
+        <i class="fas fa-chair"></i> Mesas
     </div>
 
     <div class="menu-item" onclick="go('colaboradores.html')">
@@ -64,20 +142,18 @@
 
 </div>
 
-<!-- CONTEÚDO PRINCIPAL -->
+<!-- CONTEÚDO -->
 <div class="content">
 
     <h1 class="title">Gerenciar Produtos</h1>
 
     <!-- FORMULÁRIO -->
     <div class="card">
-        <h2 id="titulo-form" style="color:var(--azul);margin-bottom:15px;">
-            Cadastrar Produto
-        </h2>
+        <h2 id="titulo-form">Cadastrar Produto</h2>
 
         <input id="nome" placeholder="Nome do produto">
         <input id="preco" placeholder="Preço (ex: 12.50)">
-        <textarea id="descricao" placeholder="Descrição"></textarea>
+        <textarea id="descricao" placeholder="Descrição do produto"></textarea>
 
         <select id="categoria">
             <option value="">Selecione a categoria</option>
@@ -88,7 +164,7 @@
         </select>
 
         <select id="quantidade">
-            <option value="">Selecione a quantidade</option>
+            <option value="">Unidade / Quantidade</option>
             <option value="200g">200g</option>
             <option value="500g">500g</option>
             <option value="1kg">1kg</option>
@@ -103,21 +179,21 @@
         <label><b>Foto do produto:</b></label>
         <input type="file" id="foto" accept="image/*">
 
-        <button class="btn btn-primary" id="btn-salvar">
+        <button class="btn-primary" id="btn-salvar">
             <i class="fas fa-save"></i> <span id="texto-botao">Cadastrar Produto</span>
         </button>
     </div>
 
     <!-- LISTA DE PRODUTOS -->
     <div class="card">
-        <h2 style="color:var(--azul);margin-bottom:15px;">Produtos cadastrados</h2>
+        <h2 style="margin-bottom:12px;">Produtos cadastrados</h2>
         <div id="listaProdutos"></div>
     </div>
 
 </div>
 
 <script type="module">
-/* ============ IMPORTS FIREBASE ============ */
+/* ========= IMPORTS FIREBASE ========= */
 import { auth, db } from "./firebase.js";
 import {
     onAuthStateChanged,
@@ -132,14 +208,13 @@ import {
     remove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ============ PROTEÇÃO ============ */
+/* ========= PROTEÇÃO ========= */
 onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "../login.html";
 });
-
 window.logout = () => signOut(auth);
 
-/* ============ VARIÁVEIS GLOBAIS ============ */
+/* ========= VARIÁVEIS ========= */
 let editId = null;
 let fotoAtual = null;
 const produtosCache = {};
@@ -148,7 +223,7 @@ const btnSalvar = document.getElementById("btn-salvar");
 const textoBotao = document.getElementById("texto-botao");
 const tituloForm = document.getElementById("titulo-form");
 
-/* ============ FUNÇÃO BASE64 ============ */
+/* ========= BASE64 ========= */
 function converterBase64(file){
     return new Promise((resolve, reject)=>{
         const reader = new FileReader();
@@ -158,42 +233,33 @@ function converterBase64(file){
     });
 }
 
-/* ============ BOTÃO SALVAR / ATUALIZAR ============ */
+/* ========= SALVAR / ATUALIZAR ========= */
 btnSalvar.onclick = async () => {
 
-    const nome       = document.getElementById("nome").value.trim();
-    const preco      = document.getElementById("preco").value.trim();
-    const descricao  = document.getElementById("descricao").value.trim();
-    const categoria  = document.getElementById("categoria").value;
+    const nome = document.getElementById("nome").value.trim();
+    const preco = document.getElementById("preco").value.trim();
+    const descricao = document.getElementById("descricao").value.trim();
+    const categoria = document.getElementById("categoria").value;
     const quantidade = document.getElementById("quantidade").value;
-    const fotoFile   = document.getElementById("foto").files[0];
+    const fotoFile = document.getElementById("foto").files[0];
 
     if (!nome || !preco || !categoria){
-        alert("Preencha pelo menos Nome, Preço e Categoria.");
+        alert("Preencha ao menos Nome, Preço e Categoria.");
         return;
     }
 
     try{
         let base64;
 
-        if(editId){  // Atualização
-            if(fotoFile){
-                base64 = await converterBase64(fotoFile);
-            }else{
-                base64 = fotoAtual; // mantém foto antiga
-            }
+        if(editId){
+            base64 = fotoFile ? await converterBase64(fotoFile) : fotoAtual;
 
             await set(ref(db, "produtos/" + editId), {
-                nome,
-                preco,
-                descricao,
-                categoria,
-                quantidade,
-                foto: base64
+                nome, preco, descricao, categoria, quantidade, foto:base64
             });
 
-            alert("Produto atualizado com sucesso!");
-        }else{       // Novo cadastro
+            alert("Produto atualizado!");
+        }else{
             if(!fotoFile){
                 alert("Selecione a foto do produto!");
                 return;
@@ -202,26 +268,21 @@ btnSalvar.onclick = async () => {
             base64 = await converterBase64(fotoFile);
 
             await push(ref(db, "produtos"), {
-                nome,
-                preco,
-                descricao,
-                categoria,
-                quantidade,
-                foto: base64
+                nome, preco, descricao, categoria, quantidade, foto:base64
             });
 
-            alert("Produto cadastrado com sucesso!");
+            alert("Produto cadastrado!");
         }
 
         limparFormulario();
 
-    }catch(erro){
-        console.error(erro);
-        alert("Erro ao salvar o produto. Veja o console.");
+    }catch(e){
+        console.error(e);
+        alert("Erro ao salvar.");
     }
 };
 
-/* ============ LIMPAR FORMULÁRIO ============ */
+/* ========= LIMPAR FORM ========= */
 function limparFormulario(){
     document.getElementById("nome").value = "";
     document.getElementById("preco").value = "";
@@ -236,32 +297,36 @@ function limparFormulario(){
     tituloForm.textContent = "Cadastrar Produto";
 }
 
-/* ============ LISTAR PRODUTOS ============ */
+/* ========= LISTA ========= */
 const lista = document.getElementById("listaProdutos");
 
-onValue(ref(db, "produtos"), snapshot => {
+onValue(ref(db, "produtos"), snap => {
     lista.innerHTML = "";
     Object.keys(produtosCache).forEach(k => delete produtosCache[k]);
 
-    snapshot.forEach(item => {
-        const p  = item.val();
+    snap.forEach(item => {
+        const p = item.val();
         const id = item.key;
+
         produtosCache[id] = p;
 
         lista.innerHTML += `
-            <div class="prod-linha">
-                <img class="prod-img" src="${p.foto}" alt="${p.nome}">
-                <div style="flex:1;">
-                    <h3 style="margin-bottom:6px;color:var(--azul);">${p.nome}</h3>
+            <div class="prod-card">
+                <img class="prod-img" src="${p.foto}">
+                
+                <div class="prod-info" style="flex:1;">
+                    <h3>${p.nome}</h3>
                     <p><b>Preço:</b> R$ ${p.preco}</p>
                     <p><b>Categoria:</b> ${p.categoria}</p>
                     <p><b>Quantidade:</b> ${p.quantidade || "-"}</p>
                     <p><b>Descrição:</b> ${p.descricao || "-"}</p>
-                    <div style="margin-top:10px;">
-                        <button class="btn btn-edit" onclick="editarProduto('${id}')">
+
+                    <div class="prod-actions" style="margin-top:10px;">
+                        <button class="btn-edit" onclick="editarProduto('${id}')">
                             <i class="fas fa-edit"></i> Editar
                         </button>
-                        <button class="btn btn-danger" onclick="excluirProduto('${id}')">
+
+                        <button class="btn-danger btn" onclick="excluirProduto('${id}')">
                             <i class="fas fa-trash"></i> Excluir
                         </button>
                     </div>
@@ -271,20 +336,20 @@ onValue(ref(db, "produtos"), snapshot => {
     });
 });
 
-/* ============ EDITAR PRODUTO ============ */
-window.editarProduto = (id) => {
+/* ========= EDITAR ========= */
+window.editarProduto = (id)=>{
     const p = produtosCache[id];
     if(!p) return;
 
     editId = id;
     fotoAtual = p.foto;
 
-    document.getElementById("nome").value        = p.nome;
-    document.getElementById("preco").value       = p.preco;
-    document.getElementById("descricao").value   = p.descricao || "";
-    document.getElementById("categoria").value   = p.categoria || "";
-    document.getElementById("quantidade").value  = p.quantidade || "";
-    document.getElementById("foto").value        = "";
+    document.getElementById("nome").value = p.nome;
+    document.getElementById("preco").value = p.preco;
+    document.getElementById("descricao").value = p.descricao || "";
+    document.getElementById("categoria").value = p.categoria;
+    document.getElementById("quantidade").value = p.quantidade || "";
+    document.getElementById("foto").value = "";
 
     textoBotao.textContent = "Atualizar Produto";
     tituloForm.textContent = "Editar Produto";
@@ -292,9 +357,9 @@ window.editarProduto = (id) => {
     window.scrollTo({ top:0, behavior:"smooth" });
 };
 
-/* ============ EXCLUIR PRODUTO ============ */
-window.excluirProduto = (id) => {
-    if(confirm("Deseja realmente excluir este produto?")){
+/* ========= EXCLUIR ========= */
+window.excluirProduto = (id)=>{
+    if(confirm("Excluir produto?")){
         remove(ref(db, "produtos/" + id));
     }
 };
