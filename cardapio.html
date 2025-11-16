@@ -6,7 +6,7 @@
 <title>Cardápio - Mava Baristro</title>
 
 <link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 /* PALETA */
@@ -15,7 +15,7 @@
     --dourado:#b88a55;
     --cinza:#f4f4f4;
     --branco:#ffffff;
-    --gold-light: #ccaa77;
+    --gold-light:#d4b37a;
 }
 
 /* GLOBAL */
@@ -35,45 +35,51 @@ body{
 /* ================= HEADER ================= */
 header{
     background:var(--azul);
-    color:var(--dourado);
-    padding:15px;
+    color:white;
+    padding:15px 20px;
     display:flex;
     align-items:center;
-    gap:15px;
+    justify-content:space-between;
     border-bottom:4px solid var(--dourado);
 }
 
+header .left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
 header img{
-    width:60px;
-    height:60px;
+    width:65px;
+    height:65px;
     border-radius:50%;
     border:3px solid var(--dourado);
     object-fit:cover;
 }
 
 header h1{
-    font-size:22px;
+    font-size:24px;
     font-weight:bold;
 }
 
-/* INFO DA MESA */
-#mesaInfo{
-    background:white;
-    padding:10px 15px;
-    border-bottom:2px solid var(--dourado);
-    font-size:16px;
+/* MESA INFO */
+header .mesa-info{
+    background:var(--dourado);
+    padding:8px 16px;
+    border-radius:8px;
     font-weight:bold;
-    color:var(--azul);
+    font-size:18px;
+    color:white;
+    box-shadow:0 3px 6px rgba(0,0,0,0.25);
 }
 
-/* NAV */
+/* ================= NAV CATEGORIAS ================= */
 .nav{
     background:white;
     display:flex;
     justify-content:center;
-    flex-wrap:wrap;
-    padding:10px;
-    gap:15px;
+    gap:25px;
+    padding:12px;
     border-bottom:2px solid var(--dourado);
 }
 
@@ -81,94 +87,149 @@ header h1{
     background:none;
     border:none;
     color:var(--azul);
-    font-size:16px;
+    font-size:17px;
     font-weight:bold;
+    padding:6px;
     cursor:pointer;
-    padding:6px 10px;
-    transition:.3s;
+    transition:.2s;
 }
 
 .nav button.active{
     border-bottom:3px solid var(--dourado);
+    color:var(--dourado);
 }
 
-/* GRID */
+/* ================= GRID ================= */
 .menu-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap:20px;
-    padding:15px;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:25px;
+    padding:20px;
 }
 
-/* CARD */
+/* ================= PRODUCT CARD ================= */
 .card{
     background:white;
-    border-radius:14px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    border-radius:16px;
     padding:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
     border:2px solid var(--dourado);
     text-align:center;
+    transition:.25s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    border-color:var(--gold-light);
 }
 
 .card img{
     width:100%;
-    height:140px;
+    height:150px;
     object-fit:cover;
-    border-radius:10px;
-    margin-bottom:5px;
+    border-radius:12px;
 }
 
-.card button.add{
-    background:var(--dourado);
-    border:none;
-    padding:10px 14px;
-    border-radius:8px;
-    cursor:pointer;
+.card h3{
+    margin:10px 0 5px;
+    font-size:18px;
+}
+
+.card p{
+    font-size:17px;
     font-weight:bold;
-    margin-top:8px;
-    width:100%;
-    color:white;
-    font-size:15px;
+    color:var(--azul);
 }
 
-/* CARRINHO */
+/* ---------------- BOTÃO ADICIONAR ---------------- */
+.card button.add{
+    width:100%;
+    background:var(--dourado);
+    color:white;
+    border:none;
+    padding:10px 0;
+    border-radius:10px;
+    margin-top:10px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.card button.add:hover{
+    background:var(--gold-light);
+}
+
+/* ================= CARRINHO ================= */
 #carrinho{
     position:fixed;
-    right:0;
     top:0;
-    width:330px;
+    right:0;
+    width:340px;
     height:100vh;
     background:white;
     border-left:4px solid var(--dourado);
     padding:20px;
-    transform:translateX(100%);
-    transition:.45s;
     overflow-y:auto;
-    z-index:999;
+    transform:translateX(100%);
+    transition:.4s;
+    z-index:1000;
 }
 
 #btn-carrinho{
     position:fixed;
-    right:15px;
-    top:15px;
+    top:20px;
+    right:20px;
     background:var(--dourado);
     color:white;
-    padding:12px 16px;
+    width:60px;
+    height:60px;
     border-radius:50%;
+    font-size:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     cursor:pointer;
-    z-index:1000;
-    font-size:22px;
+    z-index:9999;
+    box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+
+#carrinho h2{
+    margin-bottom:12px;
+    color:var(--azul);
+}
+
+#lista-itens{
+    list-style:none;
+    padding-left:0;
+}
+
+#lista-itens li{
+    background:#f0f0f0;
+    padding:10px;
+    margin-bottom:8px;
+    border-radius:8px;
+    font-size:15px;
+}
+
+#total{
+    margin-top:15px;
+    font-size:18px;
+    font-weight:bold;
 }
 
 .confirmar-btn{
     background:var(--azul);
     color:var(--dourado);
-    width:100%;
     border:none;
-    padding:12px;
-    border-radius:10px;
+    width:100%;
+    padding:14px;
+    border-radius:12px;
     margin-top:15px;
+    font-size:17px;
     font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.25);
 }
 </style>
 </head>
@@ -176,11 +237,12 @@ header h1{
 <body>
 
 <header>
-    <img src="logo_mava_baristro.png">
-    <h1>Mava Baristro - Cardápio</h1>
+    <div class="left">
+        <img src="logo_mava_baristro.png">
+        <h1>Mava Baristro</h1>
+    </div>
+    <div class="mesa-info" id="mesaInfo">Carregando mesa...</div>
 </header>
-
-<div id="mesaInfo">Carregando dados da mesa...</div>
 
 <div id="btn-carrinho"><i class="fas fa-shopping-cart"></i></div>
 
@@ -197,66 +259,60 @@ header h1{
     <h2>Carrinho</h2>
     <ul id="lista-itens"></ul>
     <h3 id="total">Total: R$ 0,00</h3>
-
     <button class="confirmar-btn" id="confirmar">Confirmar Pedido</button>
 </div>
 
 <script type="module">
-import { db } from "./ADMINISTRATIVO/firebase.js";
-import { ref, onValue, push } 
-    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ================= LEITURA DA MESA VIA URL ================= */
-const urlParams = new URLSearchParams(window.location.search);
-const mesaID = urlParams.get("mesa");
+/* ========= PEGAR MESA DO QR ========= */
+const params = new URLSearchParams(window.location.search);
+const mesa = params.get("mesa") || "Mesa não encontrada";
+document.getElementById("mesaInfo").innerText = `Bem-vindo — ${mesa}`;
 
-const mesaInfo = document.getElementById("mesaInfo");
-
-if(!mesaID){
-    mesaInfo.innerHTML = "❌ Mesa inválida. Use o QR Code correto.";
+/* ========= DEVICE ========= */
+let deviceId = localStorage.getItem("deviceId");
+if(!deviceId){
+    deviceId = "dev-" + Math.random().toString(36).substr(2,9);
+    localStorage.setItem("deviceId", deviceId);
 }
 
-/* ================= VERIFICAÇÃO DA MESA NO FIREBASE ================= */
-let clientesMesa = [];
+/* ========= FIREBASE ========= */
+import { db } from "./ADMINISTRATIVO/firebase.js";
+import { ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-onValue(ref(db, "mesas/" + mesaID), snap=>{
-    if(!snap.exists()){
-        mesaInfo.innerHTML = `Mesa ${mesaID} não configurada.`;
-        return;
-    }
-
-    const dados = snap.val();
-    clientesMesa = dados.clientes || [];
-
-    if(dados.status === "livre"){
-        mesaInfo.innerHTML = `
-            Mesa ${mesaID} — <span style="color:red;font-weight:bold;">Aguardando cadastro</span>
-        `;
-    } else {
-        mesaInfo.innerHTML = `
-            ✔️ Bem-vindo(a), <b>${clientesMesa[0]}</b> — Mesa <b>${mesaID}</b>
-        `;
+/* ========= PEGAR CLIENTE DA MESA ========= */
+let nomeCliente = "Cliente";
+onValue(ref(db, "mesas/" + mesa + "/clientes"), snap => {
+    if (snap.exists()) {
+        const arr = snap.val();
+        nomeCliente = arr[0] || "Cliente";
     }
 });
 
-/* ================= CARRINHO ================= */
-let total = 0;
-let itens = [];
-
-const carrinho = document.getElementById("carrinho");
-document.getElementById("btn-carrinho").onclick = ()=>{
-    carrinho.style.transform =
-        carrinho.style.transform === "translateX(0%)"
+/* ========= CARRINHO ========= */
+document.getElementById("btn-carrinho").onclick = () => {
+    const painel = document.getElementById("carrinho");
+    painel.style.transform =
+        painel.style.transform === "translateX(0%)"
         ? "translateX(100%)"
         : "translateX(0%)";
 };
 
-/* ================= CARREGAR PRODUTOS ================= */
-const grid = document.getElementById("grid");
+/* ========= PRODUTOS ========= */
 let categoriaAtual = "cafes";
+const grid = document.getElementById("grid");
+
+document.querySelectorAll(".nav button").forEach(btn=>{
+    btn.onclick = ()=>{
+        document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        categoriaAtual = btn.dataset.cat;
+        carregarProdutos();
+    };
+});
 
 function carregarProdutos(){
-    onValue(ref(db, "produtos"), snap=>{
+    onValue(ref(db,"produtos"), snap=>{
         grid.innerHTML = "";
 
         snap.forEach(item=>{
@@ -268,75 +324,66 @@ function carregarProdutos(){
                     <img src="${p.foto}">
                     <h3>${p.nome}</h3>
                     <p>R$ ${p.preco}</p>
-                    <p>${p.quantidade || ""}</p>
+
                     <button class="add"
-                        data-nome="${p.nome}"
-                        data-preco="${p.preco}">
-                        + Adicionar
+                     data-nome="${p.nome}"
+                     data-preco="${p.preco}">
+                        <i class="fas fa-plus"></i> Adicionar
                     </button>
-                </div>`;
+                </div>
+            `;
         });
 
-        activarBotoes();
+        ativarBotoes();
     });
 }
 carregarProdutos();
 
-document.querySelectorAll(".nav button").forEach(btn=>{
-    btn.onclick = ()=>{
-        document.querySelectorAll(".nav button")
-        .forEach(b=>b.classList.remove("active"));
+/* ========= ADICIONAR AO CARRINHO ========= */
+let total = 0;
+const ul = document.getElementById("lista-itens");
 
-        btn.classList.add("active");
-        categoriaAtual = btn.dataset.cat;
-        carregarProdutos();
-    };
-});
-
-function activarBotoes(){
+function ativarBotoes(){
     document.querySelectorAll(".add").forEach(btn=>{
         btn.onclick = ()=>{
             const nome = btn.dataset.nome;
             const preco = parseFloat(btn.dataset.preco);
 
-            itens.push(nome);
             total += preco;
+            document.getElementById("total").innerText =
+                `Total: R$ ${total.toFixed(2)}`;
 
             const li = document.createElement("li");
             li.innerText = `${nome} — R$ ${preco.toFixed(2)}`;
-            document.getElementById("lista-itens").appendChild(li);
-
-            document.getElementById("total").innerText =
-                `Total: R$ ${total.toFixed(2)}`;
+            ul.appendChild(li);
         };
     });
 }
 
-/* ================= ENVIAR PEDIDO ================= */
+/* ========= ENVIAR PEDIDO ========= */
 document.getElementById("confirmar").onclick = ()=>{
 
-    if(clientesMesa.length === 0){
-        alert("A mesa ainda não está configurada pelo recepcionista.");
-        return;
-    }
+    const itens = [];
+    ul.querySelectorAll("li").forEach(li=> itens.push(li.innerText));
 
     if(itens.length === 0){
-        alert("Adicione itens ao carrinho!");
+        alert("Adicione itens antes de confirmar!");
         return;
     }
 
     const pedido = {
-        mesa: mesaID,
-        nomes: clientesMesa,
-        itens: itens,
-        total: total,
-        status: "novo",
-        hora: Date.now()
+        mesa,
+        nomeCliente,
+        itens,
+        total,
+        status:"novo",
+        hora:Date.now(),
+        deviceId
     };
 
-    push(ref(db, "pedidos"), pedido);
+    push(ref(db,"pedidos"), pedido);
 
-    alert("Pedido enviado com sucesso!");
+    alert("Pedido enviado!");
     location.reload();
 };
 </script>
