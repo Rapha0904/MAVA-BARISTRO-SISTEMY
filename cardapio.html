@@ -9,16 +9,16 @@
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* PALETA */
+/* ================= PALETA ================= */
 :root{
     --azul:#0a0f2e;
     --dourado:#b88a55;
+    --gold-light:#d4b37a;
     --cinza:#f4f4f4;
     --branco:#ffffff;
-    --gold-light:#d4b37a;
 }
 
-/* GLOBAL */
+/* ================= GLOBAL ================= */
 *{
     margin:0;
     padding:0;
@@ -28,7 +28,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 body{
     background:var(--cinza);
-    color:var(--azul);
     overflow-x:hidden;
 }
 
@@ -36,7 +35,7 @@ body{
 header{
     background:var(--azul);
     color:white;
-    padding:15px 20px;
+    padding:15px 22px;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -54,7 +53,6 @@ header img{
     height:65px;
     border-radius:50%;
     border:3px solid var(--dourado);
-    object-fit:cover;
 }
 
 header h1{
@@ -62,15 +60,14 @@ header h1{
     font-weight:bold;
 }
 
-/* MESA INFO */
 header .mesa-info{
     background:var(--dourado);
     padding:8px 16px;
-    border-radius:8px;
-    font-weight:bold;
+    border-radius:12px;
     font-size:18px;
+    font-weight:bold;
     color:white;
-    box-shadow:0 3px 6px rgba(0,0,0,0.25);
+    box-shadow:0 3px 10px rgba(0,0,0,0.25);
 }
 
 /* ================= NAV CATEGORIAS ================= */
@@ -79,19 +76,18 @@ header .mesa-info{
     display:flex;
     justify-content:center;
     gap:25px;
-    padding:12px;
-    border-bottom:2px solid var(--dourado);
+    padding:14px;
+    border-bottom:3px solid var(--dourado);
 }
 
 .nav button{
     background:none;
     border:none;
-    color:var(--azul);
     font-size:17px;
     font-weight:bold;
-    padding:6px;
+    color:var(--azul);
     cursor:pointer;
-    transition:.2s;
+    padding:5px 10px;
 }
 
 .nav button.active{
@@ -102,24 +98,25 @@ header .mesa-info{
 /* ================= GRID ================= */
 .menu-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
-    gap:25px;
+    grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+    gap:22px;
     padding:20px;
 }
 
-/* ================= PRODUCT CARD ================= */
+/* ================= CARD IGUAL AO MESAS ================= */
 .card{
-    background:white;
+    background:#ffffff;
     border-radius:16px;
-    padding:12px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.12);
-    border:2px solid var(--dourado);
+    padding:14px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.12);
+    border:3px solid var(--dourado);
     text-align:center;
     transition:.25s;
 }
 
 .card:hover{
-    transform:translateY(-6px);
+    transform:translateY(-4px);
+    box-shadow:0 6px 16px rgba(0,0,0,0.18);
     border-color:var(--gold-light);
 }
 
@@ -131,33 +128,36 @@ header .mesa-info{
 }
 
 .card h3{
-    margin:10px 0 5px;
+    margin-top:10px;
     font-size:18px;
+    font-weight:bold;
+    color:var(--azul);
 }
 
-.card p{
+.card .preco{
+    margin-top:4px;
     font-size:17px;
     font-weight:bold;
     color:var(--azul);
 }
 
-/* ---------------- BOTÃO ADICIONAR ---------------- */
-.card button.add{
-    width:100%;
-    background:var(--dourado);
-    color:white;
+/* ================= BOTÃO ================= */
+.add-btn{
+    margin-top:12px;
+    background:var(--azul);
+    color:var(--dourado);
     border:none;
+    width:100%;
     padding:10px 0;
     border-radius:10px;
-    margin-top:10px;
     font-size:15px;
     font-weight:bold;
     cursor:pointer;
-    transition:.2s;
+    transition:.25s;
 }
 
-.card button.add:hover{
-    background:var(--gold-light);
+.add-btn:hover{
+    background:#0f173e;
 }
 
 /* ================= CARRINHO ================= */
@@ -166,37 +166,32 @@ header .mesa-info{
     top:0;
     right:0;
     width:340px;
-    height:100vh;
     background:white;
+    height:100vh;
     border-left:4px solid var(--dourado);
     padding:20px;
-    overflow-y:auto;
     transform:translateX(100%);
     transition:.4s;
-    z-index:1000;
+    overflow-y:auto;
+    z-index:999;
 }
 
 #btn-carrinho{
     position:fixed;
     top:20px;
     right:20px;
+    width:58px;
+    height:58px;
+    border-radius:50%;
     background:var(--dourado);
     color:white;
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    font-size:24px;
     display:flex;
     align-items:center;
     justify-content:center;
+    font-size:24px;
     cursor:pointer;
-    z-index:9999;
-    box-shadow:0 4px 12px rgba(0,0,0,0.25);
-}
-
-#carrinho h2{
-    margin-bottom:12px;
-    color:var(--azul);
+    box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    z-index:1000;
 }
 
 #lista-itens{
@@ -205,31 +200,23 @@ header .mesa-info{
 }
 
 #lista-itens li{
-    background:#f0f0f0;
+    background:#f4f4f4;
     padding:10px;
     margin-bottom:8px;
     border-radius:8px;
-    font-size:15px;
-}
-
-#total{
-    margin-top:15px;
-    font-size:18px;
-    font-weight:bold;
+    font-size:14px;
 }
 
 .confirmar-btn{
     background:var(--azul);
     color:var(--dourado);
-    border:none;
     width:100%;
     padding:14px;
+    font-size:17px;
+    border:none;
     border-radius:12px;
     margin-top:15px;
-    font-size:17px;
-    font-weight:bold;
     cursor:pointer;
-    box-shadow:0 4px 10px rgba(0,0,0,0.25);
 }
 </style>
 </head>
@@ -241,7 +228,8 @@ header .mesa-info{
         <img src="logo_mava_baristro.png">
         <h1>Mava Baristro</h1>
     </div>
-    <div class="mesa-info" id="mesaInfo">Carregando mesa...</div>
+
+    <div class="mesa-info" id="mesaInfo">Carregando...</div>
 </header>
 
 <div id="btn-carrinho"><i class="fas fa-shopping-cart"></i></div>
@@ -262,12 +250,12 @@ header .mesa-info{
     <button class="confirmar-btn" id="confirmar">Confirmar Pedido</button>
 </div>
 
-<script type="module">
 
+<script type="module">
 /* ========= PEGAR MESA DO QR ========= */
 const params = new URLSearchParams(window.location.search);
 const mesa = params.get("mesa") || "Mesa não encontrada";
-document.getElementById("mesaInfo").innerText = `Bem-vindo — ${mesa}`;
+document.getElementById("mesaInfo").innerText = `Mesa ${mesa}`;
 
 /* ========= DEVICE ========= */
 let deviceId = localStorage.getItem("deviceId");
@@ -282,6 +270,7 @@ import { ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 
 /* ========= PEGAR CLIENTE DA MESA ========= */
 let nomeCliente = "Cliente";
+
 onValue(ref(db, "mesas/" + mesa + "/clientes"), snap => {
     if (snap.exists()) {
         const arr = snap.val();
@@ -289,7 +278,7 @@ onValue(ref(db, "mesas/" + mesa + "/clientes"), snap => {
     }
 });
 
-/* ========= CARRINHO ========= */
+/* ========= ABRE FECHA CARRINHO ========= */
 document.getElementById("btn-carrinho").onclick = () => {
     const painel = document.getElementById("carrinho");
     painel.style.transform =
@@ -323,12 +312,12 @@ function carregarProdutos(){
                 <div class="card">
                     <img src="${p.foto}">
                     <h3>${p.nome}</h3>
-                    <p>R$ ${p.preco}</p>
+                    <p class="preco">R$ ${p.preco}</p>
 
-                    <button class="add"
+                    <button class="add-btn"
                      data-nome="${p.nome}"
                      data-preco="${p.preco}">
-                        <i class="fas fa-plus"></i> Adicionar
+                        + Adicionar
                     </button>
                 </div>
             `;
@@ -339,12 +328,12 @@ function carregarProdutos(){
 }
 carregarProdutos();
 
-/* ========= ADICIONAR AO CARRINHO ========= */
+/* ========= CARRINHO ========= */
 let total = 0;
 const ul = document.getElementById("lista-itens");
 
 function ativarBotoes(){
-    document.querySelectorAll(".add").forEach(btn=>{
+    document.querySelectorAll(".add-btn").forEach(btn=>{
         btn.onclick = ()=>{
             const nome = btn.dataset.nome;
             const preco = parseFloat(btn.dataset.preco);
@@ -373,7 +362,7 @@ document.getElementById("confirmar").onclick = ()=>{
 
     const pedido = {
         mesa,
-        nomeCliente,
+        cliente: nomeCliente,
         itens,
         total,
         status:"novo",
