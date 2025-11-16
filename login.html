@@ -6,102 +6,144 @@
 <title>Login - Mava Baristro</title>
 
 <style>
-/* PALETA */
+/* ========================== PALETA ========================== */
 :root {
     --azul:#0a0f2e;
     --dourado:#b88a55;
     --branco:#ffffff;
+    --cinza-claro:#f6f6f6;
 }
 
-/* FUNDO */
+/* ========================== FUNDO ========================== */
 body{
     margin:0;
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(125deg, var(--azul), #141c42, #0a0f2e);
+    background:
+        radial-gradient(circle at top right, #1b234b 0%, var(--azul) 60%),
+        linear-gradient(160deg, #0a0f2e, #151a3b, #0a0f2e);
     font-family:Arial, sans-serif;
+    color:var(--azul);
 }
 
-/* CARD */
+/* ========================== CARD ========================== */
 .box{
-    background:var(--branco);
-    padding:35px;
-    width:350px;
-    border-radius:16px;
-    box-shadow:0 0 18px rgba(0,0,0,0.3);
+    background:white;
+    padding:40px 35px;
+    width:360px;
+    border-radius:18px;
+    box-shadow:
+        0 0 25px rgba(0,0,0,0.18),
+        0 0 0 4px var(--dourado);
     text-align:center;
-    border:3px solid var(--dourado);
-    animation:fade 0.6s ease;
+    animation:fadeIn 0.7s ease;
+    position:relative;
 }
 
-@keyframes fade{
-    from{opacity:0; transform:translateY(25px);}
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
     to{opacity:1; transform:translateY(0);}
 }
 
-/* LOGO */
+/* Anel de brilho elegante */
+.box::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:18px;
+    padding:2px;
+    background:linear-gradient(135deg, var(--dourado), #f5d29c, var(--dourado));
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events:none;
+    opacity:0.12;
+}
+
+/* ========================== LOGO ========================== */
 .box img{
-    width:95px;
-    height:95px;
+    width:100px;
+    height:100px;
     border-radius:50%;
     border:3px solid var(--dourado);
     margin-bottom:15px;
     object-fit:cover;
+    box-shadow:0 4px 10px rgba(0,0,0,0.20);
 }
 
-/* TÍTULO */
+/* ========================== TÍTULO ========================== */
 .box h2{
     color:var(--azul);
-    margin-bottom:20px;
-    font-size:23px;
+    margin-bottom:22px;
+    font-size:24px;
+    font-weight:bold;
 }
 
-/* INPUTS */
+/* ========================== INPUTS ========================== */
 input{
     width:100%;
-    padding:12px;
-    margin-top:10px;
+    padding:13px;
+    margin-top:12px;
     border-radius:10px;
     border:2px solid #ccc;
+    background:var(--cinza-claro);
     font-size:15px;
-    transition:0.2s;
+    transition:0.25s;
 }
 
 input:focus{
     border-color:var(--dourado);
+    background:white;
     outline:none;
+    box-shadow:0 0 6px rgba(184,138,85,0.45);
 }
 
-/* BOTÃO */
+/* ========================== BOTÃO ========================== */
 button{
     width:100%;
-    margin-top:18px;
-    padding:12px;
+    margin-top:22px;
+    padding:13px;
     background:var(--azul);
     color:var(--dourado);
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     font-weight:bold;
-    font-size:16px;
+    font-size:17px;
     cursor:pointer;
     transition:0.3s;
+    letter-spacing:0.5px;
 }
 
 button:hover{
     transform:scale(1.05);
-    box-shadow:0 4px 8px rgba(0,0,0,0.2);
+    background:#0d153b;
+    box-shadow:0 4px 12px rgba(0,0,0,0.25);
 }
 
-/* ERRO */
+/* ========================== ERRO ========================== */
 #erro{
     color:#b40000;
-    margin-top:12px;
+    margin-top:14px;
     font-size:14px;
     font-weight:bold;
     display:none;
 }
+
+/* Responsividade */
+@media(max-width: 420px){
+    .box{
+        width:85%;
+        padding:30px;
+    }
+    .box img{
+        width:85px;
+        height:85px;
+    }
+}
+
 </style>
 </head>
 
@@ -109,22 +151,25 @@ button:hover{
 
 <div class="box">
     <img src="logo_mava_baristro.png" alt="Logo">
-    <h2>Login do Administrador</h2>
+    <h2>Acesso Administrativo</h2>
 
     <input id="email" type="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
 
-    <button id="btn-login">Entrar</button>
+    <button id="btn-login">
+        Entrar
+    </button>
 
     <p id="erro"></p>
 </div>
 
 <script type="module">
-/* ===== IMPORT CORRIGIDO PARA SUA ESTRUTURA ===== */
+/* ========== IMPORT CERTO ========= */
 import { auth } from "./ADMINISTRATIVO/firebase.js";
 import { signInWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+/* ========== LOGIN ========= */
 document.getElementById("btn-login").onclick = () => {
 
     const email = document.getElementById("email").value.trim();
@@ -141,11 +186,9 @@ document.getElementById("btn-login").onclick = () => {
 
     signInWithEmailAndPassword(auth, email, senha)
     .then(() => {
-        /* ===== REDIRECIONAMENTO CORRIGIDO ===== */
         window.location.href = "./ADMINISTRATIVO/dashboard.html";
     })
-    .catch((e) => {
-        console.log(e);
+    .catch(() => {
         erro.textContent = "Email ou senha incorretos!";
         erro.style.display = "block";
     });
