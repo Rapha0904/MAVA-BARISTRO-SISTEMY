@@ -25,10 +25,41 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     box-sizing:border-box;
     font-family:Arial, sans-serif;
 }
-
 body{
     background:var(--cinza);
     overflow-x:hidden;
+}
+
+/* ============== TELA BLOQUEADA ============== */
+#telaBloqueada{
+    position:fixed;
+    inset:0;
+    background:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+    z-index:999999;
+    font-size:18px;
+    color:var(--azul);
+}
+#telaBloqueada h2{
+    margin-bottom:10px;
+    color:var(--dourado);
+    font-size:26px;
+}
+#telaBloqueada button{
+    margin-top:20px;
+    padding:10px 18px;
+    border:none;
+    background:var(--azul);
+    color:var(--dourado);
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
 /* ================= HEADER ================= */
@@ -70,7 +101,7 @@ header .mesa-info{
     box-shadow:0 3px 10px rgba(0,0,0,0.25);
 }
 
-/* ================= NAV CATEGORIAS ================= */
+/* NAV */
 .nav{
     background:white;
     display:flex;
@@ -95,7 +126,7 @@ header .mesa-info{
     color:var(--dourado);
 }
 
-/* ================= GRID ================= */
+/* GRID */
 .menu-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
@@ -103,7 +134,7 @@ header .mesa-info{
     padding:20px;
 }
 
-/* ================= CARD IGUAL AO MESAS ================= */
+/* CARD */
 .card{
     background:#ffffff;
     border-radius:16px;
@@ -141,7 +172,7 @@ header .mesa-info{
     color:var(--azul);
 }
 
-/* ================= BOTÃO ================= */
+/* BOTÃO */
 .add-btn{
     margin-top:12px;
     background:var(--azul);
@@ -160,7 +191,7 @@ header .mesa-info{
     background:#0f173e;
 }
 
-/* ================= CARRINHO ================= */
+/* CARRINHO */
 #carrinho{
     position:fixed;
     top:0;
@@ -194,11 +225,6 @@ header .mesa-info{
     z-index:1000;
 }
 
-#lista-itens{
-    list-style:none;
-    padding-left:0;
-}
-
 #lista-itens li{
     background:#f4f4f4;
     padding:10px;
@@ -222,6 +248,13 @@ header .mesa-info{
 </head>
 
 <body>
+
+<!-- BLOQUEIO DA PÁGINA -->
+<div id="telaBloqueada" style="display:none;">
+    <h2 id="bloqTitulo"></h2>
+    <p id="bloqMsg"></p>
+    <button onclick="window.location.reload()">Atualizar</button>
+</div>
 
 <header>
     <div class="left">
@@ -250,9 +283,8 @@ header .mesa-info{
     <button class="confirmar-btn" id="confirmar">Confirmar Pedido</button>
 </div>
 
-
 <script type="module">
-/* ========= PEGAR MESA DO QR ========= */
+/* ====== PEGAR MESA DO QR ====== */
 const params = new URLSearchParams(window.location.search);
 const mesa = params.get("mesa") || "Mesa não encontrada";
 document.getElementById("mesaInfo").innerText = `Mesa ${mesa}`;
@@ -268,18 +300,50 @@ if(!deviceId){
 import { db } from "./ADMINISTRATIVO/firebase.js";
 import { ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ========= PEGAR CLIENTE DA MESA ========= */
-let nomeCliente = "Cliente";
+/* ===== VERIFICAR STATUS DA MESA ===== */
+let nomeCliente = null;
 
-onValue(ref(db, "mesas/" + mesa + "/clientes"), snap => {
-    if (snap.exists()) {
-        const arr = snap.val();
-        nomeCliente = arr[0] || "Cliente";
+onValue(ref(db, "mesas/" + mesa), snap => {
+
+    if (!snap.exists()){
+        bloquear("Mesa não encontrada", "Chame o atendente.");
+        return;
     }
+
+    const dados = snap.val();
+
+    if (dados.status === "livre"){
+        bloquear("Mesa não está ocupada", "Chame o atendente para liberar.");
+        return;
+    }
+
+    if (!dados.clientes || dados.clientes.length === 0){
+        bloquear("Nenhum cliente cadastrado", "Chame o atendente.");
+        return;
+    }
+
+    // OK — mesa válida
+    nomeCliente = dados.clientes[0];
+    document.getElementById("mesaInfo").innerText =
+        `Mesa ${mesa} — Bem-vindo, ${nomeCliente}`;
+
+    liberarPagina();
 });
 
-/* ========= ABRE FECHA CARRINHO ========= */
-document.getElementById("btn-carrinho").onclick = () => {
+/* BLOQUEAR TUDO */
+function bloquear(titulo, msg){
+    document.getElementById("bloqTitulo").innerText = titulo;
+    document.getElementById("bloqMsg").innerText = msg;
+    document.getElementById("telaBloqueada").style.display = "flex";
+}
+
+/* LIBERAR PÁGINA */
+function liberarPagina(){
+    document.getElementById("telaBloqueada").style.display = "none";
+}
+
+/* ========== CARRINHO ========== */
+document.getElementById("btn-carrinho").onclick = ()=>{
     const painel = document.getElementById("carrinho");
     painel.style.transform =
         painel.style.transform === "translateX(0%)"
@@ -352,6 +416,11 @@ function ativarBotoes(){
 /* ========= ENVIAR PEDIDO ========= */
 document.getElementById("confirmar").onclick = ()=>{
 
+    if(!nomeCliente){
+        alert("Mesa não está liberada para pedidos.");
+        return;
+    }
+
     const itens = [];
     ul.querySelectorAll("li").forEach(li=> itens.push(li.innerText));
 
@@ -362,7 +431,7 @@ document.getElementById("confirmar").onclick = ()=>{
 
     const pedido = {
         mesa,
-        cliente: nomeCliente,
+        nomeCliente,
         itens,
         total,
         status:"novo",
