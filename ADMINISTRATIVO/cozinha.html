@@ -3,196 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Mava Baristro</title>
+<title>Cozinha - Mava Baristro</title>
+
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* ========================== PALETA ========================== */
-:root {
-    --azul:#0a0f2e;
-    --dourado:#b88a55;
-    --branco:#ffffff;
-    --cinza-claro:#f6f6f6;
+/* BADGES */
+.status-badge{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:8px;
+    font-weight:bold;
+    margin-top:10px;
+    font-size:13px;
 }
+.status-novo{ background:#d9534f; color:white; }
+.status-prep{ background:#f0ad4e; color:white; }
+.status-pronto{ background:#5cb85c; color:white; }
 
-/* ========================== FUNDO ========================== */
-body{
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:
-        radial-gradient(circle at top right, #1b234b 0%, var(--azul) 60%),
-        linear-gradient(160deg, #0a0f2e, #151a3b, #0a0f2e);
-    font-family:Arial, sans-serif;
-    color:var(--azul);
-}
-
-/* ========================== CARD ========================== */
-.box{
+/* CARTÃO DO PEDIDO */
+.pedido-card{
     background:white;
-    padding:40px 35px;
-    width:360px;
-    border-radius:18px;
-    box-shadow:
-        0 0 25px rgba(0,0,0,0.18),
-        0 0 0 4px var(--dourado);
-    text-align:center;
-    animation:fadeIn 0.7s ease;
-    position:relative;
-}
-
-@keyframes fadeIn{
-    from{opacity:0; transform:translateY(20px);}
-    to{opacity:1; transform:translateY(0);}
-}
-
-/* Anel de brilho elegante */
-.box::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:18px;
-    padding:2px;
-    background:linear-gradient(135deg, var(--dourado), #f5d29c, var(--dourado));
-    mask: 
-        linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    pointer-events:none;
-    opacity:0.12;
-}
-
-/* ========================== LOGO ========================== */
-.box img{
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    border:3px solid var(--dourado);
+    border-radius:14px;
+    padding:16px 18px;
     margin-bottom:15px;
-    object-fit:cover;
-    box-shadow:0 4px 10px rgba(0,0,0,0.20);
+    box-shadow:0 3px 12px rgba(0,0,0,0.12);
+    transition:.25s;
+    border-left:4px solid var(--dourado);
 }
-
-/* ========================== TÍTULO ========================== */
-.box h2{
+.pedido-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 5px 16px rgba(0,0,0,0.18);
+}
+.pedido-card h3{
     color:var(--azul);
-    margin-bottom:22px;
-    font-size:24px;
-    font-weight:bold;
+    margin-bottom:4px;
+    font-size:18px;
 }
-
-/* ========================== INPUTS ========================== */
-input{
-    width:100%;
-    padding:13px;
-    margin-top:12px;
-    border-radius:10px;
-    border:2px solid #ccc;
-    background:var(--cinza-claro);
-    font-size:15px;
-    transition:0.25s;
+.pedido-card .sub{
+    font-size:13px;
+    color:#555;
+    margin-bottom:6px;
 }
-
-input:focus{
-    border-color:var(--dourado);
-    background:white;
-    outline:none;
-    box-shadow:0 0 6px rgba(184,138,85,0.45);
-}
-
-/* ========================== BOTÃO ========================== */
-button{
-    width:100%;
-    margin-top:22px;
-    padding:13px;
-    background:var(--azul);
-    color:var(--dourado);
-    border:none;
-    border-radius:12px;
-    font-weight:bold;
-    font-size:17px;
-    cursor:pointer;
-    transition:0.3s;
-    letter-spacing:0.5px;
-}
-
-button:hover{
-    transform:scale(1.05);
-    background:#0d153b;
-    box-shadow:0 4px 12px rgba(0,0,0,0.25);
-}
-
-/* ========================== ERRO ========================== */
-#erro{
-    color:#b40000;
-    margin-top:14px;
+.pedido-card ul{
+    padding-left:20px;
+    margin-top:5px;
     font-size:14px;
+}
+
+/* PISCAR NOVO PEDIDO */
+@keyframes piscar {
+    0%{background-color:#fff6c7;}
+    50%{background-color:#ffeaa7;}
+    100%{background-color:#fff6c7;}
+}
+.pedido-novo-flash{
+    animation: piscar 1s ease-in-out 4;
+}
+
+/* POPUP */
+.popup-alert {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: var(--azul);
+    color: var(--dourado);
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    animation: aparecer .4s ease;
+    z-index: 9999;
+    font-size:14px;
+}
+
+@keyframes aparecer {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.btn-row{
+    margin-top:14px;
+    display:flex;
+    gap:8px;
+}
+
+.btn{
+    padding:10px 14px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
     font-weight:bold;
-    display:none;
 }
-
-/* Responsividade */
-@media(max-width: 420px){
-    .box{
-        width:85%;
-        padding:30px;
-    }
-    .box img{
-        width:85px;
-        height:85px;
-    }
-}
-
+.btn-warning{ background:#f0ad4e;color:white; }
+.btn-primary{ background:#0275d8;color:white; }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-    <img src="logo_mava_baristro.png" alt="Logo">
-    <h2>Acesso Administrativo</h2>
+<!-- BOTÃO INVISÍVEL PARA DESBLOQUEAR ÁUDIO -->
+<button id="unlockAudio" style="opacity:0;position:absolute;top:-9999px;">Liberar</button>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
+<script>
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        const btn = document.getElementById("unlockAudio");
+        btn.click(); // dispara interação artificial
+    }, 300);
+});
+</script>
 
-    <button id="btn-login">
-        Entrar
-    </button>
-
-    <p id="erro"></p>
+<!-- NAVBAR -->
+<div class="menu-toggle" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
 </div>
 
+<div class="sidebar" id="sidebar">
+    <h2>Mava Baristro</h2>
+
+    <div class="menu-item" onclick="go('dashboard.html')">
+        <i class="fas fa-chart-line"></i> Dashboard
+    </div>
+
+    <div class="menu-item" onclick="go('produtos.html')">
+        <i class="fas fa-mug-hot"></i> Produtos
+    </div>
+
+    <div class="menu-item active" onclick="go('cozinha.html')">
+        <i class="fas fa-kitchen-set"></i> Cozinha 
+        <span id="badgeCozinha"
+              style="display:none;background:#d9534f;color:white;
+              padding:2px 8px;border-radius:10px;font-size:12px;margin-left:6px;">!</span>
+    </div>
+
+    <div class="menu-item" onclick="go('caixa.html')">
+        <i class="fas fa-cash-register"></i> Caixa
+    </div>
+
+    <div class="menu-item" onclick="go('mesas.html')">
+        <i class="fas fa-chair"></i> Mesas
+    </div>
+
+    <div class="menu-item" onclick="go('colaboradores.html')">
+        <i class="fas fa-users"></i> Colaboradores
+    </div>
+
+    <div class="menu-item" onclick="logout()">
+        <i class="fas fa-door-open"></i> Sair
+    </div>
+</div>
+
+<div class="content">
+    <h1 class="title">
+        <i class="fas fa-kitchen-set"></i> Pedidos da Cozinha
+    </h1>
+
+    <p style="margin-bottom:10px;font-size:14px;color:#555;">
+        Os pedidos aparecem em: <b>NOVO → PREPARANDO → PRONTO</b>.
+    </p>
+
+    <div id="lista"></div>
+</div>
+
+<!-- ÁUDIO NOVO PEDIDO -->
+<audio id="alertSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-censor-beep-1082.mp3" type="audio/mpeg">
+</audio>
+
+<!-- POPUP -->
+<div id="popup" class="popup-alert"></div>
+
+<!-- UNLOCK PARA AUDIO -->
+<script>
+document.getElementById("unlockAudio").addEventListener("click", () => {
+    const audio = document.getElementById("alertSound");
+    audio.volume = 1;
+    audio.play().catch(()=>{});
+});
+</script>
+
 <script type="module">
-/* ========== IMPORT CERTO ========= */
-import { auth } from "./ADMINISTRATIVO/firebase.js";
-import { signInWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged, signOut }
+ from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { ref, onValue, update }
+ from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ========== LOGIN ========= */
-document.getElementById("btn-login").onclick = () => {
+onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "../login.html";
+});
+window.logout = () => signOut(auth);
 
-    const email = document.getElementById("email").value.trim();
-    const senha = document.getElementById("senha").value.trim();
-    const erro = document.getElementById("erro");
+const lista = document.getElementById("lista");
+const popup = document.getElementById("popup");
+const badge = document.getElementById("badgeCozinha");
+const alertSound = document.getElementById("alertSound");
 
-    erro.style.display = "none";
+let primeiraLeitura = true;
+let ultimoAnunciado = null;
 
-    if(!email || !senha){
-        erro.textContent = "Preencha todos os campos!";
-        erro.style.display = "block";
-        return;
-    }
+onValue(ref(db, "pedidos"), snap => {
 
-    signInWithEmailAndPassword(auth, email, senha)
-    .then(() => {
-        window.location.href = "./ADMINISTRATIVO/dashboard.html";
-    })
-    .catch(() => {
-        erro.textContent = "Email ou senha incorretos!";
-        erro.style.display = "block";
+    const pedidos = [];
+    snap.forEach(item => {
+        const p = item.val();
+        const id = item.key;
+
+        if (!p || p.status === "finalizado") return;
+
+        pedidos.push({ id, ...p });
     });
-};
+
+    pedidos.sort((a,b)=>{
+        const ordem = { novo:1, preparando:2, pronto:3 };
+        if (ordem[a.status] !== ordem[b.status])
+            return ordem[a.status] - ordem[b.status];
+        return (a.hora||0) - (b.hora||0);
+    });
+
+    /* ALERTA DE NOVO PEDIDO */
+    if (!primeiraLeitura) {
+        const novo = pedidos.find(x => x.status === "novo");
+
+        if (novo && novo.id !== ultimoAnunciado) {
+            ultimoAnunciado = novo.id;
+
+            alertSound.currentTime = 0;
+            alertSound.play().catch(()=>{});
+
+            popup.innerText = `Novo pedido — Mesa ${novo.mesa} (${novo.nomeCliente || "Cliente"})`;
+            popup.style.display = "block";
+            setTimeout(()=> popup.style.display="none", 4000);
+
+            badge.style.display = "inline-block";
+
+            setTimeout(()=>{
+                const c = document.getElementById("pedido-"+novo.id);
+                if (c) c.classList.add("pedido-novo-flash");
+            },300);
+        }
+    }
+    primeiraLeitura = false;
+
+    lista.innerHTML = "";
+
+    pedidos.forEach(p=>{
+        lista.innerHTML += `
+            <div class="pedido-card" id="pedido-${p.id}">
+                <h3>Mesa ${p.mesa} — ${p.nomeCliente || "Cliente"}</h3>
+                <p class="sub"><b>Horário:</b> ${new Date(p.hora).toLocaleTimeString("pt-BR")}</p>
+
+                <p><b>Itens:</b></p>
+                <ul>${(p.itens||[]).map(i=>`<li>${i}</li>`).join("")}</ul>
+
+                <p style="margin-top:6px;font-size:14px;">
+                    <b>Total estimado:</b> R$ ${Number(p.total).toFixed(2)}
+                </p>
+
+                <span class="status-badge ${
+                    p.status==="novo" ? "status-novo" :
+                    p.status==="preparando" ? "status-prep" : "status-pronto"
+                }">
+                    ${p.status.toUpperCase()}
+                </span>
+
+                <div class="btn-row">
+                    ${p.status==="novo" ? `
+                        <button class="btn btn-warning" onclick="preparar('${p.id}')">
+                            <i class="fas fa-fire"></i> Preparar
+                        </button>` : ""}
+
+                    ${p.status==="preparando" ? `
+                        <button class="btn btn-primary" onclick="pronto('${p.id}')">
+                            <i class="fas fa-check"></i> Pronto
+                        </button>` : ""}
+                </div>
+            </div>
+        `;
+    });
+
+});
+
+window.preparar = id =>
+    update(ref(db,"pedidos/"+id),{status:"preparando"});
+
+window.pronto = id =>
+    update(ref(db,"pedidos/"+id),{status:"pronto"});
+</script>
+
+<script>
+function go(p){ window.location.href = p; }
+function toggleMenu(){
+    document.getElementById("sidebar").classList.toggle("active");
+}
 </script>
 
 </body>
