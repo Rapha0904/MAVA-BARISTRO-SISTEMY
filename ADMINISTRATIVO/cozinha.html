@@ -60,7 +60,7 @@
     100%{background-color:#fff6c7;}
 }
 .pedido-novo-flash{
-    animation: piscar 1s ease-in-out 3;
+    animation: piscar 1s ease-in-out 4;
 }
 
 /* POPUP */
@@ -85,12 +85,12 @@
     to {opacity: 1; transform: translateY(0);}
 }
 
-/* BOTÕES */
 .btn-row{
     margin-top:14px;
     display:flex;
     gap:8px;
 }
+
 .btn{
     padding:10px 14px;
     border:none;
@@ -98,27 +98,19 @@
     cursor:pointer;
     font-weight:bold;
 }
-.btn-warning{
-    background:#f0ad4e;
-    color:white;
-}
-.btn-primary{
-    background:#0275d8;
-    color:white;
-}
+.btn-warning{ background:#f0ad4e;color:white; }
+.btn-primary{ background:#0275d8;color:white; }
 </style>
 </head>
 
 <body>
 
-<!-- MENU MOBILE -->
+<!-- MENU -->
 <div class="menu-toggle" onclick="toggleMenu()">
     <i class="fas fa-bars"></i>
 </div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-
     <h2>Mava Baristro</h2>
 
     <div class="menu-item" onclick="go('dashboard.html')">
@@ -131,14 +123,9 @@
 
     <div class="menu-item active" onclick="go('cozinha.html')">
         <i class="fas fa-kitchen-set"></i> Cozinha 
-        <span id="badgeCozinha" style="
-            display:none;
-            background:#d9534f;
-            color:white;
-            padding:2px 8px;
-            border-radius:10px;
-            font-size:12px;
-            margin-left:6px;">!</span>
+        <span id="badgeCozinha"
+              style="display:none;background:#d9534f;color:white;
+              padding:2px 8px;border-radius:10px;font-size:12px;margin-left:6px;">!</span>
     </div>
 
     <div class="menu-item" onclick="go('caixa.html')">
@@ -158,166 +145,132 @@
     </div>
 </div>
 
-<!-- CONTEÚDO -->
 <div class="content">
-
     <h1 class="title">
         <i class="fas fa-kitchen-set"></i> Pedidos da Cozinha
     </h1>
 
     <p style="margin-bottom:10px;font-size:14px;color:#555;">
-        Os pedidos aparecem em ordem: <b>NOVO</b> → <b>PREPARANDO</b> → <b>PRONTO</b>, com Mesa e Cliente.
+        Os pedidos aparecem em: <b>NOVO → PREPARANDO → PRONTO</b>.
     </p>
 
     <div id="lista"></div>
-
 </div>
 
-<!-- ÁUDIO DO ALERTA -->
-<audio id="alertSound"
-       src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3"
-       preload="auto"></audio>
+<!-- ÁUDIO NOVO — SEGURO E COMPATÍVEL -->
+<audio id="alertSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-censor-beep-1082.mp3" type="audio/mpeg">
+</audio>
 
 <!-- POPUP -->
 <div id="popup" class="popup-alert"></div>
 
-<!-- LIBERAR ÁUDIO NO PRIMEIRO CLIQUE (MOBILE) -->
+<!-- DESBLOQUEIO DE ÁUDIO (OBRIGATÓRIO PARA CHROME/IOS) -->
 <script>
-document.addEventListener("click", function liberarAudio() {
+document.addEventListener("click", function startAudio() {
     const audio = document.getElementById("alertSound");
-    if (!audio) return;
+    audio.volume = 1;
     audio.play().catch(()=>{});
-    document.removeEventListener("click", liberarAudio);
+    document.removeEventListener("click", startAudio);
 });
 </script>
 
-<!-- ================= FIREBASE / LÓGICA COZINHA ================= -->
 <script type="module">
 import { auth, db } from "./firebase.js";
-
 import { onAuthStateChanged, signOut }
-    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+ from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { ref, onValue, update }
+ from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-import {
-    ref,
-    onValue,
-    update
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-/* PROTEÇÃO */
 onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "../login.html";
 });
 window.logout = () => signOut(auth);
 
-/* ELEMENTOS */
 const lista = document.getElementById("lista");
 const popup = document.getElementById("popup");
 const badge = document.getElementById("badgeCozinha");
 const alertSound = document.getElementById("alertSound");
 
-let primeiraVez = true;
-let ultimoIdAnunciado = null;
+let primeiraLeitura = true;
+let ultimoAnunciado = null;
 
-/* ESCUTAR PEDIDOS EM TEMPO REAL */
 onValue(ref(db, "pedidos"), snap => {
 
     const pedidos = [];
-
     snap.forEach(item => {
         const p = item.val();
         const id = item.key;
 
-        if (!p) return;
-        if (p.status === "finalizado") return;
+        if (!p || p.status === "finalizado") return;
 
         pedidos.push({ id, ...p });
     });
 
-    pedidos.sort((a, b) => {
-        const ordem = { "novo":1, "preparando":2, "pronto":3 };
-        const sa = ordem[a.status] || 99;
-        const sb = ordem[b.status] || 99;
-
-        if (sa !== sb) return sa - sb;
-        return (a.hora || 0) - (b.hora || 0);
+    pedidos.sort((a,b)=>{
+        const ordem = { novo:1, preparando:2, pronto:3 };
+        if (ordem[a.status] !== ordem[b.status])
+            return ordem[a.status] - ordem[b.status];
+        return (a.hora||0) - (b.hora||0);
     });
 
     /* ALERTA DE NOVO PEDIDO */
-    if (!primeiraVez) {
-        const novoPedido = pedidos.find(p => p.status === "novo");
+    if (!primeiraLeitura) {
+        const novo = pedidos.find(x => x.status === "novo");
 
-        if (novoPedido && novoPedido.id !== ultimoIdAnunciado) {
-            ultimoIdAnunciado = novoPedido.id;
+        if (novo && novo.id !== ultimoAnunciado) {
+            ultimoAnunciado = novo.id;
 
+            alertSound.currentTime = 0;
             alertSound.play().catch(()=>{});
 
-            const mesaTxt = novoPedido.mesa || "?";
-            const clienteTxt = novoPedido.nomeCliente || "Cliente";
-
-            popup.innerText = `Novo pedido — Mesa ${mesaTxt} (${clienteTxt})`;
+            popup.innerText = `Novo pedido — Mesa ${novo.mesa} (${novo.nomeCliente || "Cliente"})`;
             popup.style.display = "block";
-            setTimeout(()=> popup.style.display = "none", 4000);
+            setTimeout(()=> popup.style.display="none", 4000);
 
             badge.style.display = "inline-block";
 
-            setTimeout(() => {
-                const card = document.getElementById("pedido-" + novoPedido.id);
-                if (card) card.classList.add("pedido-novo-flash");
-            }, 300);
+            setTimeout(()=>{
+                const c = document.getElementById("pedido-"+novo.id);
+                if (c) c.classList.add("pedido-novo-flash");
+            },300);
         }
     }
+    primeiraLeitura = false;
 
-    primeiraVez = false;
-
-    /* RENDERIZAR LISTA */
+    /* RENDERIZAR */
     lista.innerHTML = "";
 
-    pedidos.forEach(p => {
-
-        const mesaTxt = p.mesa || "?";
-        const clienteTxt = p.nomeCliente || "Cliente não identificado";
-        const horaTxt = p.hora
-            ? new Date(p.hora).toLocaleTimeString("pt-BR")
-            : "-";
-
-        let statusClass =
-            p.status === "novo" ? "status-novo" :
-            p.status === "preparando" ? "status-prep" :
-            "status-pronto";
-
+    pedidos.forEach(p=>{
         lista.innerHTML += `
             <div class="pedido-card" id="pedido-${p.id}">
-                <h3>Mesa ${mesaTxt} — ${clienteTxt}</h3>
-                <p class="sub"><b>Horário:</b> ${horaTxt}</p>
+                <h3>Mesa ${p.mesa} — ${p.nomeCliente || "Cliente"}</h3>
+                <p class="sub"><b>Horário:</b> ${new Date(p.hora).toLocaleTimeString("pt-BR")}</p>
 
                 <p><b>Itens:</b></p>
-                <ul>
-                    ${(p.itens || []).map(i => `<li>${i}</li>`).join("")}
-                </ul>
+                <ul>${(p.itens||[]).map(i=>`<li>${i}</li>`).join("")}</ul>
 
-                ${typeof p.total === "number" ? `
-                    <p style="margin-top:6px;font-size:14px;">
-                        <b>Total estimado:</b> R$ ${p.total.toFixed(2)}
-                    </p>
-                ` : ""}
+                <p style="margin-top:6px;font-size:14px;">
+                    <b>Total estimado:</b> R$ ${Number(p.total).toFixed(2)}
+                </p>
 
-                <span class="status-badge ${statusClass}">
+                <span class="status-badge ${
+                    p.status==="novo" ? "status-novo" :
+                    p.status==="preparando" ? "status-prep" : "status-pronto"
+                }">
                     ${p.status.toUpperCase()}
                 </span>
 
                 <div class="btn-row">
-                    ${p.status === "novo" ? `
+                    ${p.status==="novo" ? `
                         <button class="btn btn-warning" onclick="preparar('${p.id}')">
                             <i class="fas fa-fire"></i> Preparar
-                        </button>
-                    ` : ""}
+                        </button>` : ""}
 
-                    ${p.status === "preparando" ? `
+                    ${p.status==="preparando" ? `
                         <button class="btn btn-primary" onclick="pronto('${p.id}')">
                             <i class="fas fa-check"></i> Pronto
-                        </button>
-                    ` : ""}
+                        </button>` : ""}
                 </div>
             </div>
         `;
@@ -325,19 +278,15 @@ onValue(ref(db, "pedidos"), snap => {
 
 });
 
-/* AÇÕES */
-window.preparar = id => {
-    update(ref(db, "pedidos/" + id), { status: "preparando" });
-    badge.style.display = "none";
-};
+window.preparar = id =>
+    update(ref(db,"pedidos/"+id),{status:"preparando"});
 
-window.pronto = id => {
-    update(ref(db, "pedidos/" + id), { status: "pronto" });
-};
+window.pronto = id =>
+    update(ref(db,"pedidos/"+id),{status:"pronto"});
 </script>
 
 <script>
-function go(p){ window.location.href = p }
+function go(p){ window.location.href = p; }
 function toggleMenu(){
     document.getElementById("sidebar").classList.toggle("active");
 }
