@@ -77,7 +77,7 @@
     <i class="fas fa-bars"></i>
 </div>
 
-<!-- NAVBAR COMPLETA E CORRIGIDA -->
+<!-- NAVBAR -->
 <div class="sidebar" id="sidebar">
 
     <h2>Mava Baristro</h2>
@@ -262,7 +262,7 @@ onValue(ref(db, "pedidos"), pedidosSnap => {
 
 });
 
-/* FINALIZA TODA A MESA */
+/* PAGAMENTO DA COMANDA PARA DEIXAR A MESA DISPONIVEL */
 window.finalizarMesa = async mesaId => {
 
     const forma = document.getElementById("pg-" + mesaId).value;
